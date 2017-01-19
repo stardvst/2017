@@ -1,44 +1,34 @@
 #include <iostream>
-#include <string>
 #include <vector>
-#include <functional>
 
 
-template<typename T, typename Comparator>
-const T& find_max(const std::vector<T>& v, Comparator is_less_than) {
-  int max_index = 0;
-
-  for(size_t i = 1; i < v.size(); ++i) {
-    if(is_less_than(v[max_index], v[i])) {
-      max_index = i;
+template<typename T>
+class matrix {
+public:
+  matrix(int rows, int cols) : arr(rows) {
+    for(int i = 0; i < rows; ++i) {
+      arr[i].resize(cols);
     }
   }
 
-  return v[max_index];
-}
+  const std::vector<T>& operator[](int row) const { return arr[row]; }
+  std::vector<T>& operator[](int row) { return arr[row]; }
 
-template<typename T> // using default ordering
-const T& find_max(const std::vector<T>& v) {
-  return find_max(v, std::less<T>());
-}
-
-
-class case_sensitive_cmp {
-public:
-  bool operator()(const std::string& lhs, const std::string& rhs) {
-    return _stricmp(lhs.c_str(), rhs.c_str()) < 0;
-  }
+  int numrows() { return arr.size(); }
+  int numcols() { return numrows() ? arr[0].size() : 0; }
+private:
+  std::vector<std::vector<T> > arr;
 };
 
+void copy(const matrix<int>& from, matrix<int>& to) {
+  for(int i = 0; i < to.numrows(); ++i) {
+    to[i] = from[i];
+  }
+}
+// to[i]    - operator[]
+// from[i]  - const operator[] const
+
 int main() {
-
-  std::vector<std::string> v(3);
-  v[0] = "ZEBRA";
-  v[1] = "alligator";
-  v[2] = "crocodile";
-
-  std::cout << find_max(v, case_sensitive_cmp()) << std::endl;
-  std::cout << find_max(v);
  
   std::cin.get();
   return 0;
