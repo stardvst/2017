@@ -7,7 +7,6 @@ void print(int n) {
   std::cout << n % 10;
 }
 
-
 int main() {
 
   print(156784);
