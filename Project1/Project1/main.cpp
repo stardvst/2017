@@ -1,35 +1,44 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <iterator>
 
 
-template<typename T>
-class matrix {
-public:
-  matrix(int rows, int cols) : arr(rows) {
-    for(int i = 0; i < rows; ++i) {
-      arr[i].resize(cols);
+int main() {
+
+  std::vector<int> vi;
+
+  int n;
+  std::cout << "enter n: ";
+  std::cin >> n;
+  n = (int)n;
+  
+  int k = n / 2;
+
+  std::cout << '\n';
+
+  int item;
+  for(int i = 0; i < k; ++i) {
+    std::cout << "enter item " << i + 1 << ": ";
+    std::cin >> item;
+    vi.push_back(item);
+  }
+  std::sort(vi.begin(), vi.end(), [](int a, int b) {return a > b; });
+
+  for(int i = 0; i < k; ++i) {
+    std::cout << "enter another item: ";
+    std::cin >> item;
+    if(item > vi[k - 1]) {
+      vi.erase(vi.begin() + k-1);
+      vi.push_back(item);
+      std::sort(vi.begin(), vi.end(), [](int a, int b) {return a > b; });
     }
   }
 
-  const std::vector<T>& operator[](int row) const { return arr[row]; }
-  std::vector<T>& operator[](int row) { return arr[row]; }
+  std::cout << vi[k-1];
 
-  int numrows() { return arr.size(); }
-  int numcols() { return numrows() ? arr[0].size() : 0; }
-private:
-  std::vector<std::vector<T> > arr;
-};
 
-void copy(const matrix<int>& from, matrix<int>& to) {
-  for(int i = 0; i < to.numrows(); ++i) {
-    to[i] = from[i];
-  }
-}
-// to[i]    - operator[]
-// from[i]  - const operator[] const
-
-int main() {
- 
+  std::cin.get();
   std::cin.get();
   return 0;
 }
