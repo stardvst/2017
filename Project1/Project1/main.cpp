@@ -132,7 +132,7 @@ int main() {
       size_t new_row = row;
       size_t new_col = col;
 
-      for(size_t i = 0; i < abs(static_cast<long>(row - col)); ++i) {
+      for(size_t i = 0; i < ((col > row) ? col - row : row - col); ++i) {
         --new_row;
         ++new_col;
         word.append(1, board[new_row][new_col]);
@@ -141,7 +141,7 @@ int main() {
           guessed_words.push_back(word);
           std::cout << word << std::endl;
         }
-      }
+      } 
     }
   }
 
