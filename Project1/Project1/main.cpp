@@ -1,46 +1,88 @@
 #include <iostream>
-#include <list>
 
-//void printLots(const std::list<int>& l, const std::list<int>& p) {
-//  for(std::list<int>::const_iterator pit = p.begin(); pit != p.end(); ++pit) {
-//    if(*pit < 0 || *pit > l.size()) { continue; }
-//    std::list<int>::const_iterator lit = l.begin();
-//    std::advance(lit, *pit - 1);
-//    std::cout << *lit << ' ';
-//  }
-//}
+/* 3.2(a) - swap two adjacent elements */
+template<typename T>
+class singly_linked_list {
+public:
+  singly_linked_list() : head(0), size(0) {}
 
-void printLots(const std::list<int>& l, const std::list<int>& p) {
-  for(std::list<int>::const_iterator pit = p.begin(); pit != p.end(); ++pit) {
-    if(*pit < 0 || *pit > l.size()) { continue; }
-    size_t index = 1;
-    for(std::list<int>::const_iterator lit = l.begin(); lit != l.end(); ++lit, ++index) {
-      if(*pit == index) {
-        std::cout << *lit << ' ';
+  void insert(int value) {
+    Node* newNode = new Node(value);
+    if(!head) { 
+      head = newNode; 
+    } else {
+      Node* tmp = head;
+      while(tmp->next) {
+        tmp = tmp->next;
+      }
+      tmp->next = newNode;
+    }
+    ++size;
+  }
+
+  void swap_adjacent() {
+    if(size == 0 || size == 1) { return; }
+
+    Node* prev = 0;
+    Node* current = head;
+    Node* next = current->next;
+
+    head = next;
+
+    while(current != 0 && next != 0) {
+      current->next = next->next;
+      next->next = current;
+      
+      if(prev != 0) {
+        prev->next = next;
+      }
+
+      prev = current;
+      current = current->next;
+
+      if(current != 0) {
+        next = current->next;
       }
     }
   }
-}
+
+  void print() const {
+    Node* tmp = head;
+    for(size_t i = 1; i <= size; ++i) {
+      std::cout << tmp->data << ' ';
+      tmp = tmp->next;
+    }
+  }
+private:
+  struct Node {
+    T data;
+    Node* next;
+
+    Node(T d = T(), Node* n = 0) :data(d), next(n) {}
+  };
+
+private:
+  Node* head;
+  size_t size;
+};
+
 
 int main() {
 
-  std::list<int> l;
-  std::list<int> p;
+  singly_linked_list<int> slli;
 
-  l.push_front(8);
-  l.push_back(6);
-  l.push_back(4);
-  l.push_back(7);
-  l.push_back(3);
-  l.push_back(1);
+  slli.insert(4);
+  slli.insert(6);
+  slli.insert(7);
+  slli.insert(9);
+  slli.insert(5);
+  slli.insert(1);
 
-  p.push_back(5);
-  p.push_back(2);
-  p.push_back(6);
-  p.push_back(7); // skips this one
-  p.push_back(4);
+  slli.print();
 
-  printLots(l, p);
+  std::cout << '\n';
+  slli.swap_adjacent();
+  slli.print();
 
   std::cin.get();
   return 0;
