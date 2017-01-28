@@ -1,92 +1,101 @@
 #include <iostream>
 
-/* 3.2(b) - swap two adjacent elements */
-template<typename T>
-class doubly_linked_list {
-public:
-  doubly_linked_list() : head(0), tail(0) {}
-
-  void insert(int value) {
-    Node* newNode = new Node(value);
-    if(!head) {
-      head = newNode;
-    } else {
-      Node* tmp = head;
-      while(tmp->next) {
-        tmp = tmp->next;
-      }
-      tmp->next = newNode;
-    }
-  }
-
-  void swap_adjacent() {
-    if(head == 0 || head->next == 0) { return; }
-
-    Node* prev = 0;
-    Node* current = head;
-    Node* next = current->next;
-
-    head = next;
-
-    while(current != 0 && next != 0) {
-      current->next = next->next;
-      next->next = current;
-      next->next->prev = current;
-
-      next->prev = (next != head) ? prev : 0;
-      current->prev = next;
-
-      if(prev != 0) {
-        prev->next = next;
-      }
-
-      prev = current;
-      current = current->next;
-
-      if(current != 0) {
-        next = current->next;
-      }
-    }
-  }
-
-  void print() const {
-    Node* tmp = head;
-    while(tmp) {
-      std::cout << tmp->data << ' ';
-      tmp = tmp->next;
-    }
-  }
-private:
-  struct Node {
-    T data;
-    Node* next;
-    Node* prev;
-
-    Node(T d = T(), Node* n = 0, Node* p = 0) :data(d), next(n), prev(p) {}
-  };
-
-private:
-  Node* head;
-  Node* tail;
+struct Node {
+  Node* prev;
+  int data;
+  Node* next;
+  Node(Node* p, int d, Node* n) :prev(p), data(d), next(n) {}
 };
+
+class iterator {
+  friend class List;
+public:
+  iterator(Node* ptr) :node(ptr) {}
+  int operator*() const { return node->data; }
+  iterator& operator++() { node = node->next; return *this; }
+  bool operator==(const iterator& ob) const { return ob.node == node; }
+  bool operator!=(const iterator& ob) const { return ob.node != node; }
+private:
+  Node* node;
+};
+
+class List {
+public:
+  List() : first(0), last(0) {}
+
+  void insert(iterator it, int value) {
+    if(first == last) {
+      Node* newNode = new Node(0, value, 0);
+
+      if(!first) {
+        first = last = newNode;
+      } else {
+        first = newNode;
+        newNode->next = last;
+      }
+    } else {
+      _insert(it.node, value);
+    }
+  }
+
+  iterator begin() { return iterator(first); }
+  iterator end() { return iterator(0); }
+private:
+  Node* first;
+  Node* last;
+
+  void _insert(Node* node, int value) {
+    Node* newNode = new Node(0, value, 0);
+    if(node == first) {
+      first = newNode;
+    }
+    newNode->next = node;
+    if(node->prev) {
+      node->prev->next = newNode;
+    }
+    newNode->prev = node->prev;
+    node->prev = newNode;
+    //node->next->prev = newNode;
+    
+    
+    //node->next = newNode;
+  }
+};
+
+
+template<typename Iterator, typename T>
+iterator find(Iterator start, Iterator end, const T& x) {
+  while(start != end) {
+    if(*start == x) {
+      return start;
+    }
+    ++start;
+  }
+  return end;
+}
 
 
 int main() {
 
-  doubly_linked_list<int> dlli;
+  List l;
+  l.insert(l.begin(), 6);
+  l.insert(l.begin(), 7);
+  l.insert(l.begin(), 8);
+  l.insert(l.begin(), 1);
+  l.insert(l.begin(), 7);
+  l.insert(l.begin(), 3);
 
-  dlli.insert(4);
-  dlli.insert(6);
-  dlli.insert(7);
-  dlli.insert(9);
-  dlli.insert(5);
-  dlli.insert(1);
+  for(iterator it = l.begin(); it != l.end(); ++it) {
+    std::cout << *it << " -> ";
+  }
+  std::cout << "NULL\n\n";
 
-  dlli.print();
-
-  std::cout << '\n';
-  dlli.swap_adjacent();
-  dlli.print();
+  iterator occ = find(l.begin(), ++++++++l.begin(), 7);
+  while(occ != l.end()) {
+    std::cout << *occ << " -> ";
+    ++occ;
+  }
+  std::cout << "NULL";
 
   std::cin.get();
   return 0;
