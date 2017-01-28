@@ -1,15 +1,15 @@
 #include <iostream>
 
-/* 3.2(a) - swap two adjacent elements */
+/* 3.2(b) - swap two adjacent elements */
 template<typename T>
-class singly_linked_list {
+class doubly_linked_list {
 public:
-  singly_linked_list() : head(0), size(0) {}
+  doubly_linked_list() : head(0), tail(0) {}
 
   void insert(int value) {
     Node* newNode = new Node(value);
-    if(!head) { 
-      head = newNode; 
+    if(!head) {
+      head = newNode;
     } else {
       Node* tmp = head;
       while(tmp->next) {
@@ -17,11 +17,10 @@ public:
       }
       tmp->next = newNode;
     }
-    ++size;
   }
 
   void swap_adjacent() {
-    if(size == 0 || size == 1) { return; }
+    if(head == 0 || head->next == 0) { return; }
 
     Node* prev = 0;
     Node* current = head;
@@ -32,7 +31,11 @@ public:
     while(current != 0 && next != 0) {
       current->next = next->next;
       next->next = current;
-      
+      next->next->prev = current;
+
+      next->prev = (next != head) ? prev : 0;
+      current->prev = next;
+
       if(prev != 0) {
         prev->next = next;
       }
@@ -48,7 +51,7 @@ public:
 
   void print() const {
     Node* tmp = head;
-    for(size_t i = 1; i <= size; ++i) {
+    while(tmp) {
       std::cout << tmp->data << ' ';
       tmp = tmp->next;
     }
@@ -57,32 +60,33 @@ private:
   struct Node {
     T data;
     Node* next;
+    Node* prev;
 
-    Node(T d = T(), Node* n = 0) :data(d), next(n) {}
+    Node(T d = T(), Node* n = 0, Node* p = 0) :data(d), next(n), prev(p) {}
   };
 
 private:
   Node* head;
-  size_t size;
+  Node* tail;
 };
 
 
 int main() {
 
-  singly_linked_list<int> slli;
+  doubly_linked_list<int> dlli;
 
-  slli.insert(4);
-  slli.insert(6);
-  slli.insert(7);
-  slli.insert(9);
-  slli.insert(5);
-  slli.insert(1);
+  dlli.insert(4);
+  dlli.insert(6);
+  dlli.insert(7);
+  dlli.insert(9);
+  dlli.insert(5);
+  dlli.insert(1);
 
-  slli.print();
+  dlli.print();
 
   std::cout << '\n';
-  slli.swap_adjacent();
-  slli.print();
+  dlli.swap_adjacent();
+  dlli.print();
 
   std::cin.get();
   return 0;
