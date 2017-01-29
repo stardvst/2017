@@ -1,99 +1,107 @@
 #include <iostream>
+#include <algorithm>
+#include <functional>
+#include <list>
 
-struct Node {
-  Node* prev;
-  int data;
-  Node* next;
-  Node(Node* p, int d, Node* n) :prev(p), data(d), next(n) {}
-};
+std::list<int> get_intersection(const std::list<int>& l1, const std::list<int>& l2) {
+  std::list<int> result;
 
-class iterator {
-  friend class List;
-public:
-  iterator(Node* ptr) :node(ptr) {}
-  int operator*() const { return node->data; }
-  iterator& operator++() { node = node->next; return *this; }
-  bool operator==(const iterator& ob) const { return ob.node == node; }
-  bool operator!=(const iterator& ob) const { return ob.node != node; }
-private:
-  Node* node;
-};
-
-class List {
-public:
-  List() : first(0), last(0) {}
-
-  void insert(iterator it, int value) {
-    if(first == last) {
-      Node* newNode = new Node(0, value, 0);
-
-      if(!first) {
-        first = last = newNode;
-      } else {
-        first = newNode;
-        newNode->next = last;
+  for(std::list<int>::const_iterator l1it = l1.begin(); l1it != l1.end(); ++l1it) {
+    std::list<int>::const_iterator l2it = l2.begin();
+    while(l2it != l2.end() && *l2it != *l1it) {
+      ++l2it;
+    }
+    if(l2it != l2.end()) {
+      if(*l1it == *l2it && std::find(result.begin(), result.end(), *l1it) == result.end()) {
+        result.push_back(*l1it);
       }
+    }
+  }
+
+  return result;
+}
+
+template<typename C>
+std::list<int> get_union(const std::list<int>& l1, const std::list<int>& l2, C cmp) {
+  std::list<int> result;
+
+  std::list<int>::const_iterator l1it = l1.begin();
+  std::list<int>::const_iterator l2it = l2.begin();
+
+  while(l1it != l1.end() && l2it != l2.end()) {
+    if(cmp(*l1it, *l2it)) {
+      result.push_back(*l1it);
+      ++l1it;
+    } else if(cmp(*l2it, *l1it)) {
+      result.push_back(*l2it);
+      ++l2it;
     } else {
-      _insert(it.node, value);
+      result.push_back(*l1it);
+      ++l1it;
+      ++l2it;
     }
   }
 
-  iterator begin() { return iterator(first); }
-  iterator end() { return iterator(0); }
-private:
-  Node* first;
-  Node* last;
-
-  void _insert(Node* node, int value) {
-    Node* newNode = new Node(0, value, 0);
-    if(node == first) {
-      first = newNode;
-    }
-    newNode->next = node;
-    if(node->prev) {
-      node->prev->next = newNode;
-    }
-    newNode->prev = node->prev;
-    node->prev = newNode;
-    //node->next->prev = newNode;
-    
-    
-    //node->next = newNode;
+  while(l1it != l1.end()) {
+    if(std::find(result.begin(), result.end(), *l1it) == result.end()) { result.push_back(*l1it); }
+    ++l1it;
   }
-};
-
-
-template<typename Iterator, typename T>
-iterator find(Iterator start, Iterator end, const T& x) {
-  while(start != end) {
-    if(*start == x) {
-      return start;
-    }
-    ++start;
+  while(l2it != l2.end()) {
+    if(std::find(result.begin(), result.end(), *l2it) == result.end()) { result.push_back(*l2it); }
+    ++l2it;
   }
-  return end;
+
+  return result;
 }
 
 
 int main() {
 
-  List l;
-  l.insert(l.begin(), 6);
-  l.insert(l.begin(), 7);
-  l.insert(l.begin(), 8);
-  l.insert(l.begin(), 1);
-  l.insert(l.begin(), 7);
-  l.insert(l.begin(), 3);
+  std::list<int> l1;
+  std::list<int> l2;
 
-  for(iterator it = l.begin(); it != l.end(); ++it) {
+  l1.push_back(4);
+  l1.push_back(5);
+  l1.push_back(2);
+  l1.push_back(-5);
+  l1.push_back(3);
+  l1.push_back(-1);
+  l1.push_back(0);
+  l1.push_back(7);
+
+  l2.push_back(5);
+  l2.push_back(0);
+  l2.push_back(8);
+  l2.push_back(6);
+  l2.push_back(7);
+  l2.push_back(3);
+  l2.push_back(-10);
+
+  l1.sort(std::greater<int>());
+  std::cout << "L1\t";
+  for(std::list<int>::const_iterator it = l1.begin(); it != l1.end(); ++it) {
     std::cout << *it << " -> ";
   }
   std::cout << "NULL\n\n";
 
-  iterator occ = find(l.begin(), ++++++++l.begin(), 7);
-  while(occ != l.end()) {
-    std::cout << *occ << " -> ";
-    ++occ;
+  l2.sort(std::greater<int>());
+  std::cout << "L2\t";
+  for(std::list<int>::const_iterator it = l2.begin(); it != l2.end(); ++it) {
+    std::cout << *it << " -> ";
+  }
+  std::cout << "NULL\n\n";
+
+  std::list<int> result = get_intersection(l1, l2);
+  std::cout << "L1&L2\t";
+  for(std::list<int>::const_iterator it = result.begin(); it != result.end(); ++it) {
+    std::cout << *it << " -> ";
+  }
+  std::cout << "NULL\n\n";
+
+  result = get_union(l1, l2, std::greater<int>());
+  std::cout << "L1|L2\t";
+  for(std::list<int>::const_iterator it = result.begin(); it != result.end(); ++it) {
+    std::cout << *it << " -> ";
   }
   std::cout << "NULL";
 
