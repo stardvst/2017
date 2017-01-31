@@ -1,224 +1,199 @@
 #include <iostream>
 
-
 template<typename T>
-class Vector {
+class singly_linked_list {
+  template<typename U>
+  friend class Methods;
 public:
-
-  class iterator {
-  public:
-    iterator(T* address) :element(address) {}
-    T& operator*() { return *element; }
-    void operator++() { ++element; }
-    bool operator==(const iterator& x) const { return x.element == element; }
-    bool operator!=(const iterator& x) const { return x.element != element; }
-  private:
-    T* element;
-  };
-
-  explicit Vector(int init_size = 0) 
-    :the_size(init_size), the_capacity(init_size + SPARE_CAPACITY) {
-    arr = new T[the_capacity];
-  }
-  Vector(const Vector& rhs) 
-    :arr(0) { 
-    operator=(rhs); 
-  }
-  ~Vector() {
-    delete[] arr;
-  }
-
-  const Vector& operator=(const Vector& rhs) {
-    if(this != &rhs) {
-      delete[] arr;
-      the_size = rhs.size();
-      the_capacity = rhs.the_capacity;
-
-      arr = new T[the_size];
-      for(int k = 0; k < the_size; ++k) {
-        arr[k] = rhs.arr[k];
-      }
-    }
-    return *this;
-  }
-
-  void resize(int new_size) {
-    if(new_size > the_capacity) {
-      reserve(new_size * 2 + 1);
-    }
-    the_size = new_size;
-  }
-
-  void reserve(int new_capacity) {
-    if(new_capacity < the_size) {
-      return;
-    }
-
-    T* old = arr;
-    arr = new T[new_capacity];
-    for(int k = 0; k < the_size; ++k) {
-      arr[k] = old[k];
-    }
-
-    the_capacity = new_capacity;
-    delete[] old;
-  }
-
-  T& operator[](int index) { 
-    if(index < 0 || index >= the_size) { throw std::exception(); }
-    return arr[index]; 
-  }
-  const T& operator[](int index) const { 
-    if(index < 0 || index >= the_size) { throw std::exception(); }
-    return arr[index]; 
-  }
-
-  bool empty() const { return size() == 0; }
-  int size() const { return the_size; }
-  int capacity() const { return the_capacity; }
-
-  void push_back(const T& x) {
-    if(the_size == the_capacity) {
-      reserve(2 * the_capacity + 1);
-    }
-    arr[the_size++] = x;
-  }
-
-  void pop_back() const { --the_size; }
-  const T& back() const { return arr[the_size - 1]; }
-
-
-  //typedef T* iterator;
-  //typedef const T* const_iterator;
-
-  iterator begin() { return iterator(&arr[0]); }
-  //const_iterator begin() const { return &arr[0]; }
-  iterator end() { return iterator(&arr[size()]); }
-  //const_iterator end() const { return &arr[size()]; }
-
-  enum { SPARE_CAPACITY = 16 };
-
-
-  /* 3.8 */
-  void insert(T* position, const T& x) {
-    if(the_size == the_capacity) {
-      reserve(2 * the_capacity + 1);
-    }
-
-    if(position == &arr[the_size - 1]) {
-      push_back(x);
-    } else {
-      T* old = arr;
-      arr = new T[the_size + 1];
-
-      int i = 0;
-      for(T* it = old; it != position; ++it, ++i) {
-        arr[i] = old[i];
-      }
-      arr[i] = x;
-      for(; i < the_size; ++i) {
-        arr[i + 1] = old[i];
-      }
-
-      delete[] old;
-      ++the_size;
-    }
-  }
-
-  void erase(T* position) {
-    T* old = arr;
-    arr = new T[the_size - 1];
-
-    int i = 0;
-    int j = 0;
-    for(T* it = old; it != &old[the_size]; ++it, ++j) {
-      if(it != position) {
-        arr[i++] = old[j];
-      }
-    }
-
-    delete[] old;
-    --the_size;
-  }
-
-  /* 3.10 */
-  void insert(iterator position, const T& x) {
-    if(the_size == the_capacity) {
-      reserve(2 * the_capacity + 1);
-    }
-
-    if(position == iterator(&arr[the_size - 1])) {
-      push_back(x);
-    } else {
-      T* old = arr;
-      arr = new T[the_size + 1];
-
-      int i = 0;
-      for(iterator it = iterator(old); it != position; ++it, ++i) {
-        arr[i] = old[i];
-      }
-      arr[i] = x;
-      for(; i < the_size; ++i) {
-        arr[i + 1] = old[i];
-      }
-
-      delete[] old;
-      ++the_size;
-    }
-  }
+  singly_linked_list() : head(0) {}
 
 private:
-  int the_size;
-  int the_capacity;
-  T* arr;
+  struct Node {
+    T data;
+    Node* next;
+
+    Node(T d = T(), Node* n = 0) :data(d), next(n) {}
+  };
+
+private:
+  Node* head;
+};
+
+template<typename T>
+class Methods {
+public:
+  int size(const singly_linked_list<T>& lst) const {
+    typename singly_linked_list<T>::Node* tmp = lst.head;
+    int size = 0;
+    while(tmp) {
+      ++size;
+      tmp = tmp->next;
+    }
+    return size;
+  }
+
+  void print(const singly_linked_list<T>& lst) const {
+    typename singly_linked_list<T>::Node* tmp = lst.head;
+    while(tmp) {
+      std::cout << tmp->data << ' ';
+      tmp = tmp->next;
+    }
+  }
+
+  bool contains(const singly_linked_list<T>& lst, T value) const {
+    typename singly_linked_list<T>::Node* tmp = lst.head;
+    while(tmp) {
+      if(tmp->data == value) {
+        return true;
+      }
+      tmp = tmp->next;
+    }
+    return false;
+  }
+
+  void add(singly_linked_list<T>& lst, T value) {
+    if(!contains(lst, value)) {
+      typename singly_linked_list<T>::Node* newNode = new singly_linked_list<T>::Node(value);
+      if(!lst.head) {
+        lst.head = newNode;
+      } else {
+        singly_linked_list<T>::Node* tmp = lst.head;
+        while(tmp->next) {
+          tmp = tmp->next;
+        }
+        tmp->next = newNode;
+      }
+    }
+  }
+
+  void remove(singly_linked_list<T>& lst, T value) {
+    typename singly_linked_list<T>::Node* tmp = lst.head;
+    typename singly_linked_list<T>::Node* prev = 0;
+    while(tmp) {
+      if(tmp->data == value) {
+        if(tmp == lst.head) {
+          lst.head = tmp->next;
+          delete tmp;
+        } else {
+          prev->next = tmp->next;
+          delete tmp;
+          tmp = prev->next;
+        }
+      } else {
+        prev = tmp;
+        tmp = tmp->next;
+      }
+    }
+  }
+
+  void sort(singly_linked_list<T>& lst) {
+    for(typename singly_linked_list<T>::Node* index = lst.head; index != 0; index = index->next) {
+      for(typename singly_linked_list<T>::Node* selection = index->next;
+          selection != 0; selection = selection->next) {
+        if(selection->data > index->data) {
+          T tmp = index->data;
+          index->data = selection->data;
+          selection->data = tmp;
+        }
+      }
+    }
+  }
+
+  /* 3.12 */
+  // a. size  - the same
+  // b. print - the same
+
+  bool contains_sorted(const singly_linked_list<T>& lst, T value) const {
+    typename singly_linked_list<T>::Node* tmp = lst.head;
+    while(tmp && tmp->data >= value) {
+      if(tmp->data == value) {
+        return true;
+      }
+      tmp = tmp->next;
+    }
+    return false;
+  }
+
+  void add_sorted(singly_linked_list<T>& lst, T value) {
+    if(!contains(lst, value)) {
+      typename singly_linked_list<T>::Node* newNode = new singly_linked_list<T>::Node(value);
+      if(!lst.head) {
+        lst.head = newNode;
+      } else {
+        singly_linked_list<T>::Node* tmp = lst.head;
+        while(tmp && tmp->data >= value) {
+          if(!tmp->next || (tmp->next && tmp->next->data < value)) { // !tmp->next - inserting as last item
+            newNode->next = tmp->next;
+            tmp->next = newNode;
+            return;
+          }
+          tmp = tmp->next;
+        }
+      }
+    }
+  }
+
+  void remove_sorted(singly_linked_list<T>& lst, T value) {
+    typename singly_linked_list<T>::Node* tmp = lst.head;
+    typename singly_linked_list<T>::Node* prev = 0;
+    while(tmp && tmp->data >= value) {
+      if(tmp->data == value) {
+        if(tmp == lst.head) {
+          lst.head = tmp->next;
+          delete tmp;
+        } else {
+          prev->next = tmp->next;
+          delete tmp;
+          tmp = prev->next;
+        }
+      } else {
+        prev = tmp;
+        tmp = tmp->next;
+      }
+    }
+  }
+
 };
 
 int main() {
+
+  singly_linked_list<int> slli;
+  Methods<int> methods;
+
+  methods.add(slli, 4);
+  methods.add(slli, 6);
+  methods.add(slli, 7);
+  methods.add(slli, 9);
+  methods.add(slli, 1);
+  methods.add(slli, 5);
+
+  methods.print(slli);
+  std::cout << "\nsize: " << methods.size(slli);
+  std::cout << "\nlist contains 5: " << std::boolalpha << methods.contains(slli, 5);
+  std::cout << "\nlist contains 3: " << std::boolalpha << methods.contains(slli, 3);
   
-  Vector<int> vi(10);
-  for(int i = 0; i < 10; ++i) {
-    vi[i] = 0;
-  }
- 
-  vi.insert(vi.begin(), 4);
-  vi.insert(&vi[4], 7);
-  vi.insert(&vi[7], 8);
-  vi[2] = 2;
-  for(Vector<int>::iterator it = vi.begin(); it != vi.end(); ++it) {
-    std::cout << *it << " ";
-  }
-  std::cout << "\nsize: " << vi.size() << "\n\n";
+  methods.add(slli, 3);
+  std::cout << "\nadded 3 to the list: ";
+  methods.print(slli);
 
-  vi.erase(&vi[0]);
-  vi.erase(&vi[1]);
-  vi.erase(&vi[2]);
-  vi.erase(&vi[3]);
-  vi.erase(&vi[4]);
-  vi.erase(&vi[5]);
-  vi.erase(&vi[6]);
+  methods.remove(slli, 3);
+  std::cout << "\nremoved 3 from the list: ";
+  methods.print(slli);
 
-  vi.erase(&vi[5]);
-  vi.erase(&vi[4]);
-  vi.erase(&vi[3]);
-  vi.erase(&vi[2]);
-  vi.erase(&vi[1]);
-  vi.erase(&vi[0]);
-  std::cout << "erased, size: " << vi.size() << "\n";
-  for(int i = 0; i < vi.size(); ++i) { // prints nothing
-    std::cout << vi[i] << " ";
-  }
+  methods.sort(slli);
+  std::cout << "\n\nsorted list: ";
+  methods.print(slli);
 
-  /* 3.9 */
-  /*
-    a call to push_back, pop_back, insert, erase invalidates
-    all iterators because:
-    1. insert and erase allocate new arrays
-    2. push_back allocates new array if needed
-    3. The call to pop_back() removes the last element in the 
-    vector and so the iterator to that element is invalidated. 
-    The pop_back() call does not invalidate iterators to items 
-    before the last element, only reallocation will do that
-  */
+  std::cout << "\nsorted list contains 5: " << std::boolalpha << methods.contains_sorted(slli, 5);
+  std::cout << "\nsorted list contains 3: " << std::boolalpha << methods.contains_sorted(slli, 3);
+
+  methods.add_sorted(slli, 0);
+  std::cout << "\nadded 0 to the sorted list: ";
+  methods.print(slli);
+
+  methods.remove_sorted(slli, 0);
+  std::cout << "\nremoved 0 from the list: ";
+  methods.print(slli);
 
   std::cin.get();
   return 0;
