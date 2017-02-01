@@ -1,199 +1,132 @@
 #include <iostream>
+#include <string>
+#include <stack>
 
-template<typename T>
-class singly_linked_list {
-  template<typename U>
-  friend class Methods;
-public:
-  singly_linked_list() : head(0) {}
-
-private:
-  struct Node {
-    T data;
-    Node* next;
-
-    Node(T d = T(), Node* n = 0) :data(d), next(n) {}
-  };
-
-private:
-  Node* head;
-};
-
-template<typename T>
-class Methods {
-public:
-  int size(const singly_linked_list<T>& lst) const {
-    typename singly_linked_list<T>::Node* tmp = lst.head;
-    int size = 0;
-    while(tmp) {
-      ++size;
-      tmp = tmp->next;
-    }
-    return size;
+bool check_match(std::stack<char>& symbols, char symbol) {
+  if(symbols.size() && 
+     (symbol == ')' && symbols.top() == '(') ||
+     (symbol == ']' && symbols.top() == '[') ||
+     (symbol == '}' && symbols.top() == '{')) {
+    symbols.pop();
+    return true;
   }
+  return false;
+}
 
-  void print(const singly_linked_list<T>& lst) const {
-    typename singly_linked_list<T>::Node* tmp = lst.head;
-    while(tmp) {
-      std::cout << tmp->data << ' ';
-      tmp = tmp->next;
-    }
-  }
+bool balancing_symbols_pascal(const std::string& input) {
 
-  bool contains(const singly_linked_list<T>& lst, T value) const {
-    typename singly_linked_list<T>::Node* tmp = lst.head;
-    while(tmp) {
-      if(tmp->data == value) {
-        return true;
+  std::stack<char> symbols;
+  bool balanced = true;
+
+  for(size_t i = 0; i < input.length(); ++i) {
+    switch(input[i]) {
+    case '(': 
+    case '[': 
+    case '{': 
+      symbols.push(input[i]); break;
+    case 'b':
+      if(i != input.length() - 4 &&
+         input[i + 2] == 'g' &&
+         input[i + 3] == 'i' &&
+         input[i + 4] == 'n') {
+        symbols.push('b');
+        i += 3; // advaance i to point to the symbol after "begin"
       }
-      tmp = tmp->next;
-    }
-    return false;
-  }
-
-  void add(singly_linked_list<T>& lst, T value) {
-    if(!contains(lst, value)) {
-      typename singly_linked_list<T>::Node* newNode = new singly_linked_list<T>::Node(value);
-      if(!lst.head) {
-        lst.head = newNode;
-      } else {
-        singly_linked_list<T>::Node* tmp = lst.head;
-        while(tmp->next) {
-          tmp = tmp->next;
-        }
-        tmp->next = newNode;
+      break;
+    case ')':
+    case ']':
+    case '}':
+      balanced = check_match(symbols, input[i]);
+      break;
+    case 'e':
+      if(i != input.length() - 2 &&
+         input[i + 1] == 'n'&&
+         input[i + 2] == 'd') {
+        symbols.size() && symbols.top() == 'b' ? symbols.pop() : balanced = false;
+        ++i; // advaance i to point to the symbol after "end"
       }
+      break;
+    default:
+      break;
     }
   }
 
-  void remove(singly_linked_list<T>& lst, T value) {
-    typename singly_linked_list<T>::Node* tmp = lst.head;
-    typename singly_linked_list<T>::Node* prev = 0;
-    while(tmp) {
-      if(tmp->data == value) {
-        if(tmp == lst.head) {
-          lst.head = tmp->next;
-          delete tmp;
-        } else {
-          prev->next = tmp->next;
-          delete tmp;
-          tmp = prev->next;
-        }
-      } else {
-        prev = tmp;
-        tmp = tmp->next;
+  if(!symbols.empty()) {
+    balanced = false;
+  }
+
+  return balanced;
+}
+
+bool balancing_symbols_cpp(const std::string& input) {
+
+  std::stack<char> symbols;
+  bool balanced = true;
+
+  for(size_t i = 0; i < input.length(); ++i) {
+    switch(input[i]) {
+    case '(':
+    case '[':
+    case '{':
+      symbols.push(input[i]); break;
+    case '/':
+      if(i != input.length() - 1 &&
+         input[i + 1] == '*') {
+        symbols.push('/');
+        ++i; // advaance i to point to the symbol after "/*"
       }
-    }
-  }
-
-  void sort(singly_linked_list<T>& lst) {
-    for(typename singly_linked_list<T>::Node* index = lst.head; index != 0; index = index->next) {
-      for(typename singly_linked_list<T>::Node* selection = index->next;
-          selection != 0; selection = selection->next) {
-        if(selection->data > index->data) {
-          T tmp = index->data;
-          index->data = selection->data;
-          selection->data = tmp;
-        }
+      break;
+    case ')':
+    case ']':
+    case '}':
+      balanced = check_match(symbols, input[i]);
+      break;
+    case '*':
+      if(i != input.length() - 1 &&
+         input[i + 1] == '/') {
+        symbols.size() && symbols.top() == '/' ? symbols.pop() : balanced = false;
+        ++i; // advaance i to point to the symbol after "end"
       }
+      break;
+    default:
+      break;
     }
   }
 
-  /* 3.12 */
-  // a. size  - the same
-  // b. print - the same
-
-  bool contains_sorted(const singly_linked_list<T>& lst, T value) const {
-    typename singly_linked_list<T>::Node* tmp = lst.head;
-    while(tmp && tmp->data >= value) {
-      if(tmp->data == value) {
-        return true;
-      }
-      tmp = tmp->next;
-    }
-    return false;
+  if(!symbols.empty()) {
+    balanced = false;
   }
 
-  void add_sorted(singly_linked_list<T>& lst, T value) {
-    if(!contains(lst, value)) {
-      typename singly_linked_list<T>::Node* newNode = new singly_linked_list<T>::Node(value);
-      if(!lst.head) {
-        lst.head = newNode;
-      } else {
-        singly_linked_list<T>::Node* tmp = lst.head;
-        while(tmp && tmp->data >= value) {
-          if(!tmp->next || (tmp->next && tmp->next->data < value)) { // !tmp->next - inserting as last item
-            newNode->next = tmp->next;
-            tmp->next = newNode;
-            return;
-          }
-          tmp = tmp->next;
-        }
-      }
-    }
-  }
-
-  void remove_sorted(singly_linked_list<T>& lst, T value) {
-    typename singly_linked_list<T>::Node* tmp = lst.head;
-    typename singly_linked_list<T>::Node* prev = 0;
-    while(tmp && tmp->data >= value) {
-      if(tmp->data == value) {
-        if(tmp == lst.head) {
-          lst.head = tmp->next;
-          delete tmp;
-        } else {
-          prev->next = tmp->next;
-          delete tmp;
-          tmp = prev->next;
-        }
-      } else {
-        prev = tmp;
-        tmp = tmp->next;
-      }
-    }
-  }
-
-};
+  return balanced;
+}
 
 int main() {
 
-  singly_linked_list<int> slli;
-  Methods<int> methods;
+  std::string input;
 
-  methods.add(slli, 4);
-  methods.add(slli, 6);
-  methods.add(slli, 7);
-  methods.add(slli, 9);
-  methods.add(slli, 1);
-  methods.add(slli, 5);
-
-  methods.print(slli);
-  std::cout << "\nsize: " << methods.size(slli);
-  std::cout << "\nlist contains 5: " << std::boolalpha << methods.contains(slli, 5);
-  std::cout << "\nlist contains 3: " << std::boolalpha << methods.contains(slli, 3);
+  /* check for pascal */
+  std::cout << "enter a code snippet in pascal:\n\n";
   
-  methods.add(slli, 3);
-  std::cout << "\nadded 3 to the list: ";
-  methods.print(slli);
+  std::string line = " ";
+  while(line.length() != 0) {
+    std::getline(std::cin, line);
+    input += line;
+  }
 
-  methods.remove(slli, 3);
-  std::cout << "\nremoved 3 from the list: ";
-  methods.print(slli);
+  std::cout << "the code in pascal is balanced: "
+    << std::boolalpha << balancing_symbols_pascal(input) << "\n\n\n\n";
 
-  methods.sort(slli);
-  std::cout << "\n\nsorted list: ";
-  methods.print(slli);
+  /* check for c++ */
+  std::cout << "enter a code snippet in c++:\n\n";
 
-  std::cout << "\nsorted list contains 5: " << std::boolalpha << methods.contains_sorted(slli, 5);
-  std::cout << "\nsorted list contains 3: " << std::boolalpha << methods.contains_sorted(slli, 3);
+  line = " ";
+  while(line.length() != 0) {
+    std::getline(std::cin, line);
+    input += line;
+  }
 
-  methods.add_sorted(slli, 0);
-  std::cout << "\nadded 0 to the sorted list: ";
-  methods.print(slli);
-
-  methods.remove_sorted(slli, 0);
-  std::cout << "\nremoved 0 from the list: ";
-  methods.print(slli);
+  std::cout << "the code in c++ is balanced: "
+    << std::boolalpha << balancing_symbols_cpp(input);
 
   std::cin.get();
   return 0;
