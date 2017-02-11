@@ -23,15 +23,15 @@ void merge(std::vector<int>& arr, std::vector<int>& tmp, size_t low, size_t mid,
     tmp[k++] = arr[j++];
   }
 
-  for(int t = low; t <= high; ++t) {
+  for(size_t t = low; t <= high; ++t) {
     arr[t] = tmp[t];
   }
 }
 
 void merge_sort(std::vector<int>& arr, std::vector<int>& tmp, size_t low, size_t high) {
   if(low < high) {
-    size_t mid = (low + high) / 2;
-    merge_sort(arr, tmp, low, mid);
+    size_t mid = low + (high - low) / 2; // same as (low + high)/2 but safer (won't overflow)
+    merge_sort(arr, tmp, low, mid); 
     merge_sort(arr, tmp, mid + 1, high);
     merge(arr, tmp, low, mid, high);
   }
