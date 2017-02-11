@@ -1,36 +1,65 @@
 #include <iostream>
-#include <string>
+#include <vector>
+#include <ctime>
 
+void merge(std::vector<int>& arr, std::vector<int>& tmp, size_t low, size_t mid, size_t high) {
 
-void reverse(std::string&, int, int);
+  size_t i = low;
+  size_t j = mid + 1;
+  size_t  k = low;
 
-void reverse_words(std::string& line) {
-  reverse(line, 0, line.length() - 1);
-
-  int word_start = 0;
-  for(int i = 0; i < line.length(); ++i) {
-    if(line[i] == ' ') {
-      reverse(line, word_start, i - 1);
-      word_start = i + 1;
-    } else if(i == line.length() - 1) {
-      reverse(line, word_start, i);
+  while(i <= mid && j <= high) {
+    if(arr[i] <= arr[j]) {
+      tmp[k++] = arr[i++];
+    } else {
+      tmp[k++] = arr[j++];
     }
+  }
+
+  while(i <= mid) {
+    tmp[k++] = arr[i++];
+  }
+  while(j <= high) {
+    tmp[k++] = arr[j++];
+  }
+
+  for(int t = low; t <= high; ++t) {
+    arr[t] = tmp[t];
   }
 }
 
-void reverse(std::string& word, int start, int end) {
-  while(start < end) {
-    std::swap(word[start], word[end]);
-    ++start;
-    --end;
+void merge_sort(std::vector<int>& arr, std::vector<int>& tmp, size_t low, size_t high) {
+  if(low < high) {
+    size_t mid = (low + high) / 2;
+    merge_sort(arr, tmp, low, mid);
+    merge_sort(arr, tmp, mid + 1, high);
+    merge(arr, tmp, low, mid, high);
   }
+}
+
+void merge_sort(std::vector<int>& arr) {
+  std::vector<int> tmp(arr.size());
+  merge_sort(arr, tmp, 0, arr.size() - 1);
 }
 
 int main() {
 
-  std::string line = "she is nice";
-  reverse_words(line);
-  std::cout << line;
+  srand(static_cast<unsigned>(time(NULL)));
+
+  std::vector<int> arr;
+  for(int i = 0; i < 12; ++i) {
+    arr.push_back(rand() % 12 + 1);
+  }
+  for(std::vector<int>::const_iterator it = arr.begin(); it != arr.end(); ++it) {
+    std::cout << *it << " ";
+  }
+  std::cout << "\n";
+
+  merge_sort(arr);
+  for(std::vector<int>::const_iterator it = arr.begin(); it != arr.end(); ++it) {
+    std::cout << *it << " ";
+  }
+
 
   std::cin.get();
 }
