@@ -2,15 +2,13 @@
 #define ALIST_HPP
 
 #include <cassert>
-#include <limits>
 #include "List.hpp"
 
 
-template<typename T>
+template <typename T>
 class AList : public List<T> {
 public:
-  AList(size_t n) : list(new T[n]), size(0),
-    max_size(n), current(0), max_value(std::numeric_limits<T>::min()) {}
+  AList(size_t n) : list(new T[n]), size(0), max_size(n), current(0) {}
   ~AList() { delete[] list; }
 
   bool insert(const T&);
@@ -24,20 +22,17 @@ public:
   void move_to(int);
   bool next();
 
-  T get_value() const { return list[current]; }
-  int curr_pos() const { return current - 2; }
+  T get_value() const;
+  int curr_pos() const { return current; }
   bool empty() const { return size == 0; }
   size_t get_size() const { return size; }
 
-  T get_max() const { return max_value; }
-  void remove_max_values();
-
+  bool end() const { return current == size; }
 private:
   T* list;
   size_t size;
   size_t max_size;
   int current;
-  T max_value;
 
   AList(const AList&) {}
   const AList& operator=(const AList&) {}
@@ -50,11 +45,8 @@ bool AList<T>::insert(const T& x) {
     for(size_t i = size; i > current; --i) {
       list[i] = list[i - 1];
     }
-    list[current] = x; 
+    list[current] = x;
     ++size;
-    if(x > max_value) {
-      max_value = x;
-    }
     return true;
   }
   return false;
@@ -63,10 +55,7 @@ bool AList<T>::insert(const T& x) {
 template <typename T>
 bool AList<T>::append(const T& x) {
   if(size < max_size) {
-    list[++size] = x;
-    if(x > max_value) {
-      max_value = x;
-    }
+    list[size++] = x;
     return true;
   }
   return false;
@@ -74,22 +63,23 @@ bool AList<T>::append(const T& x) {
 
 template <typename T>
 bool AList<T>::erase(const T& x) {
-  if(size == 0) return false;
+  assert(size != 0);
   for(size_t i = 0; i < size; ++i) {
     if(list[i] == x) {
-      for(size_t j = i; j < size; ++j) {
+      for(size_t j = i; j < size - 1; ++j) {
         list[j] = list[j + 1];
       }
       --size;
       return true;
     }
   }
+  return false;
 }
 
 template <typename T>
 bool AList<T>::erase_curr() {
-  if(size == 0) return false;
-  for(size_t i = current; i < size; ++i) {
+  assert(size != 0);
+  for(size_t i = current; i < size - 1; ++i) {
     list[i] = list[i + 1];
   }
   --size;
@@ -98,30 +88,29 @@ bool AList<T>::erase_curr() {
 
 template <typename T>
 bool AList<T>::clear() {
-  if(size != 0) {
-    delete[] list;
-    current = 0;
-    list = new T[max_size];
-    return true;
-  }
-  return false;
+  assert(size != 0);
+  delete[] list;
+  list = new T[max_size];
+  size = 0;
+  current = 0;
+  return true;
 }
 
 template <typename T>
 void AList<T>::move_to_start() {
-  assert(size != 0 && "list is empty");
+  assert(size != 0);
   current = 0;
 }
 
 template <typename T>
 void AList<T>::move_to(int pos) {
-  assert(pos >= 0 && pos < size && "pos out of range");
+  assert(pos >= 0 && pos < size);
   current = pos;
 }
 
 template <typename T>
 bool AList<T>::next() {
-  if(current < size - 1) {
+  if(current + 1 < size) {
     ++current;
     return true;
   }
@@ -129,22 +118,9 @@ bool AList<T>::next() {
 }
 
 template <typename T>
-void AList<T>::remove_max_values() {
-  if(size != 0) {
-    current = 0; // move_to_start();
-    for(size_t i = 0; i < size; ) {
-      if(list[i] == max_value) {
-        for(size_t j = i; j < size; ++j) {
-          list[j] = list[j + 1];
-        }
-        --size;
-      } else {
-        ++i;
-        ++current; // next();
-      }
-    }
-  }
-  current = 0;
+T AList<T>::get_value() const {
+  assert(current >= 0 && current < size);
+  return list[current];
 }
 
 

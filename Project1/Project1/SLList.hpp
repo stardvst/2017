@@ -1,9 +1,7 @@
 #ifndef SLLIST_HPP
 #define SLLIST_HPP
 
-#include <iostream>
 #include <cassert>
-#include <numeric>
 #include "List.hpp"
 
 
@@ -29,9 +27,7 @@ public:
   bool empty() const { return size == 0; }
   size_t get_size() const { return size; }
 
-  T get_max() const { return max_value; }
-  void remove_max_values();
-
+  bool end() const { return current == tail->next; }
 private:
   void init();
   void remove_all();
@@ -47,7 +43,9 @@ private:
   Node* current;
   Node* tail;
   size_t size;
-  T max_value;
+
+  SLList(const SLList&) {}
+  const SLList& operator=(const SLList&) {}
 };
 
 
@@ -55,7 +53,6 @@ template <typename T>
 void SLList<T>::init() {
   head = current = tail = new Node;
   size = 0;
-  max_value = std::numeric_limits<T>::min();
 }
 
 template <typename T>
@@ -63,9 +60,6 @@ bool SLList<T>::insert(const T& x) {
   current->next = new Node(x, current->next);
   if(current == tail) {
     tail = current->next;
-  }
-  if(x > max_value) {
-    max_value = x;
   }
   ++size;
   return true;
@@ -75,39 +69,44 @@ template <typename T>
 bool SLList<T>::append(const T& x) {
   tail->next = new Node(x);
   tail = tail->next;
-  if(x > max_value) {
-    max_value = x;
-  }
   ++size;
   return true;
 }
 
 template <typename T>
 bool SLList<T>::erase(const T& x) {
-  assert(size != 0 && "list is empty");
+  assert(size != 0);
 
-  move_to_start();
-  for(; current != tail && current->next; current = current->next) {
+  current = head;
+  Node* tmp = head;
+  Node* prev = head;
+  while(current && current->next) {
     if(x == current->next->data) {
-      Node* tmp = current->next;
+      tmp = current->next;
       current->next = tmp->next;
+      prev = current;
       delete tmp;
       --size;
       return true;
+    } else {
+      current = current->next;
     }
   }
 
   if(x == current->data) {
+    prev->next = 0;
     delete tail;
-    tail = current;
-    tail->next = 0;
+    tail = prev;
+    --size;
     return true;
   }
+  return false;
 }
 
 template <typename T>
 bool SLList<T>::erase_curr() {
-  assert(size != 0 && "list is empty");
+  assert(size != 0);
+
   Node* tmp = current->next;
   current->next = tmp->next;
   if(tail == tmp) {
@@ -120,6 +119,7 @@ bool SLList<T>::erase_curr() {
 
 template <typename T>
 bool SLList<T>::clear() {
+  assert(size != 0);
   remove_all();
   init();
   return true;
@@ -127,13 +127,13 @@ bool SLList<T>::clear() {
 
 template <typename T>
 void SLList<T>::move_to_start() {
-  assert(size != 0 && "list is empty");
-  current = head;
+  assert(size != 0);
+  current = head->next;
 }
 
 template <typename T>
 void SLList<T>::move_to(int pos) {
-  assert(pos >= 0 && pos < size && "pos out of range");
+  assert(pos >= 0 && pos < size);
   move_to_start();
   while(pos--) {
     next();
@@ -157,18 +157,6 @@ int SLList<T>::curr_pos() const {
     tmp = tmp->next;
   }
   return i;
-}
-
-template <typename T>
-void SLList<T>::remove_max_values() {
-  if(size != 0) {
-    current = head->next;
-    for(; current != 0; current = current->next) {
-      if(max_value == current->data) {
-        erase(max_value);
-      }
-    }
-  }
 }
 
 template <typename T>

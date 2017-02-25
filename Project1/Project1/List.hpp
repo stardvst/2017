@@ -2,7 +2,7 @@
 #define LIST_HPP
 
 
-template <typename T>
+template<typename T>
 class List {
 public:
   List() {}
@@ -23,6 +23,8 @@ public:
   virtual T get_value() const = 0;
   virtual bool empty() const = 0;
   virtual size_t get_size() const = 0;
+
+  virtual bool end() const = 0;
 private:
   List(const List&) {}
   const List& operator=(const List&) {}

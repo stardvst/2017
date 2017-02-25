@@ -30,9 +30,7 @@ public:
   bool empty() const { return size == 0; }
   size_t get_size() const { return size; }
 
-  T get_max() const { return max_value; }
-  void remove_max_values();
-
+  bool end() const { return current == tail->next; }
 private:
   void init();
   void remove_all();
@@ -41,7 +39,9 @@ private:
   Node<T>* current;
   Node<T>* tail;
   size_t size;
-  T max_value;
+  
+  DLList(const DLList&) {}
+  const DLList& operator=(const DLList&) {}
 };
 
 
@@ -49,7 +49,6 @@ template <typename T>
 void DLList<T>::init() {
   head = current = tail = new Node<T>;
   size = 0;
-  max_value = std::numeric_limits<T>::min();
 }
 
 template <typename T>
@@ -58,9 +57,7 @@ bool DLList<T>::insert(const T& x) {
   if(current == tail) {
     tail = current->next;
   }
-  if(x > max_value) {
-    max_value = x;
-  }
+  current = current->next;
   ++size;
   return true;
 }
@@ -69,9 +66,6 @@ template <typename T>
 bool DLList<T>::append(const T& x) {
   tail->next = new Node<T>(x, tail, NULL);
   tail = tail->next;
-  if(x > max_value) {
-    max_value = x;
-  }
   ++size;
   return true;
 }
@@ -80,7 +74,7 @@ template <typename T>
 bool DLList<T>::erase(const T& x) {
   assert(size != 0 && "list is empty");
 
-  move_to_start();
+  current = head;
   for(; current != tail && current->next; current = current->next) {
     if(x == current->next->data) {
       Node<T>* tmp = current->next;
@@ -103,6 +97,7 @@ bool DLList<T>::erase(const T& x) {
     tail->next = 0;
     return true;
   }
+  return false;
 }
 
 template <typename T>
@@ -128,13 +123,13 @@ bool DLList<T>::clear() {
 
 template <typename T>
 void DLList<T>::move_to_start() {
-  assert(size != 0 && "list is empty");
-  current = head;
+  assert(size != 0);
+  current = head->next;
 }
 
 template <typename T>
 void DLList<T>::move_to(int pos) {
-  assert(pos >= 0 && pos < size && "pos out of range");
+  assert(pos >= 0 && pos < size);
   move_to_start();
   while(pos--) {
     next();
@@ -158,18 +153,6 @@ int DLList<T>::curr_pos() const {
     tmp = tmp->next;
   }
   return i;
-}
-
-template <typename T>
-void DLList<T>::remove_max_values() {
-  if(size != 0) {
-    current = head->next;
-    for(; current != 0; current = current->next) {
-      if(max_value == current->data) {
-        erase(max_value);
-      }
-    }
-  }
 }
 
 template <typename T>
