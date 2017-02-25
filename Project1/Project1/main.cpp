@@ -1,8 +1,6 @@
 #include <iostream>
-#include "AList.hpp"
-#include "SLList.hpp"
-#include "DLList.hpp"
-#include "list_max.hpp"
+#include "Set.hpp"
+#include "set_intersect_union.hpp"
 
 
 template <typename T>
@@ -23,154 +21,49 @@ void print_list(List<T>* list) {
 
 int main() {
 
-  // array based list
-  List<int>* list = new AList<int>(10);
-
-  //list->move_to_start(); // assert
-
-  std::cout << "array based list\n-----------------------\n"
-    "is empty: " << std::boolalpha << list->empty() << 
-    ", size: " << list->get_size() << '\n';
+  std::cout << "intersection and union\n-------------------------\n";
+  List<int>* set1 = new Set<int>;
+  List<int>* set2 = new Set<int>;
+  List<int>* result = new Set<int>;
 
   int number = 0;
-  while(number <= 0 || number > 10) {
-    std::cout << "\nenter the number of elements (1-10): ";
+  while(number <= 0) {
+    std::cout << "\nenter the number of elements in set 1: ";
     std::cin >> number;
   }
+
   int current;
   for(int i = 0; i < number; ++i) {
-    std::cout << "list[" << i << "] = ";
+    std::cout << "set1[" << i << "] = ";
     std::cin >> current;
-    list->insert(current);
+    set1->insert(current);
   }
 
-  std::cout << "\nlist: "; 
-  print_list(list);
-
-  std::cout << "\nsize: " << list->get_size();
-  std::cout << "\nmax: " << get_max(list);
-  std::cout << "\n\nenter a value to erase: ";
-  std::cin >> number;
-
-  if(list->erase(number)) {
-    std::cout << number << " deleted";
-    std::cout << "\nlist: ";
-    print_list(list);
-  } else {
-    std::cout << number << " not in the list";
-  }
-
-  std::cout << "\n\nremoving max values...";
-  try {
-    remove_max_values(list);
-  }
-  catch(const std::exception& e) {
-    std::cerr << e.what() << std::endl;
-  }
-
-  std::cout << "\nlist: ";
-  print_list(list);
-
-  //list->move_to(100); // assert
-
-  delete list;
-
-
-
-
-  // singly linked list
-  list = new SLList<int>;
-  std::cout << "\n\n\n\nsingly linked list\n-----------------------\n"
-    "is empty: " << std::boolalpha << list->empty() <<
-    ", size: " << list->get_size() << '\n';
+  std::cout << "\nset1: ";
+  print_list(set1);
 
   for(number = 0; number <= 0; ) {
-    std::cout << "\nenter the number of elements: ";
+    std::cout << "\n\nenter the number of elements in set 2: ";
     std::cin >> number;
   }
   for(int i = 0; i < number; ++i) {
-    std::cout << "list[" << i << "] = ";
+    std::cout << "set2[" << i << "] = ";
     std::cin >> current;
-    list->insert(current);
+    set2->insert(current);
   }
 
-  std::cout << "\nlist: ";
-  print_list(list);
+  std::cout << "\nset2: ";
+  print_list(set2);
 
-  std::cout << "\nsize: " << list->get_size();
-  std::cout << "\nmax: " << get_max(list);
-  std::cout << "\n\nenter a value to erase: ";
-  std::cin >> number;
+  get_intersection(set1, set2, result);
+  std::cout << "\n\nset1 & set2 intersection: ";
+  print_list(result);
 
-  if(list->erase(number)) {
-    std::cout << number << " deleted";
-    std::cout << "\nlist: ";
-    print_list(list);
-  } else {
-    std::cout << number << " not in the list";
-  }
-
-  std::cout << "\n\nremoving max values...";
-  try {
-    remove_max_values(list);
-  }
-  catch(const std::exception& e) {
-    std::cerr << e.what() << std::endl;
-  }
-
-  std::cout << "\nlist: ";
-  print_list(list);
-
-  delete list;
-
-
-
-
-  // doubly linked list
-  list = new DLList<int>;
-  std::cout << "\n\n\n\ndoubly linked list\n-----------------------\n"
-    "is empty: " << std::boolalpha << list->empty() <<
-    ", size: " << list->get_size() << '\n';
-
-  for(number = 0; number <= 0; ) {
-    std::cout << "\nenter the number of elements: ";
-    std::cin >> number;
-  }
-  for(int i = 0; i < number; ++i) {
-    std::cout << "list[" << i << "] = ";
-    std::cin >> current;
-    list->insert(current);
-  }
-
-  std::cout << "\nlist: ";
-  print_list(list);
-
-  std::cout << "\nsize: " << list->get_size();
-  std::cout << "\nmax: " << get_max(list);
-  std::cout << "\n\nenter a value to erase: ";
-  std::cin >> number;
-
-  if(list->erase(number)) {
-    std::cout << number << " deleted";
-    std::cout << "\nlist: ";
-    print_list(list);
-  } else {
-    std::cout << number << " not in the list";
-  }
-
-  std::cout << "\n\nremoving max values...";
-  try {
-    remove_max_values(list);
-  }
-  catch(const std::exception& e) {
-    std::cerr << e.what() << std::endl;
-  }
-
-  std::cout << "\nlist: ";
-  print_list(list);
-
-  delete list;
-
+  result->clear();
+  
+  get_union(set1, set2, result);
+  std::cout << "\n\nset1 and set2 union: ";
+  print_list(result);
 
   std::cin.get();
   std::cin.get();
