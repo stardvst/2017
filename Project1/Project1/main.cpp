@@ -1,69 +1,118 @@
 #include <iostream>
-#include "Set.hpp"
-#include "set_intersect_union.hpp"
+#include <cassert>
+#include <memory>
 
 
-template <typename T>
-void print_list(List<T>* list) {
-  if(list->get_size() != 0) {
-    int count = 0;
-    list->move_to_start();
-    while(count++ < list->get_size()) {
-      std::cout << list->get_value() << " -> ";
-      list->next();
-    }
-    std::cout << "NULL";
-  } else {
-    std::cout << "empty";
+template<typename T>
+class Deque {
+public:
+  Deque() : front(new Node), rear(new Node) { 
+    front->next = rear; 
+    rear->prev = front; 
   }
+  ~Deque();
+
+  void push_front(const T&);
+  void push_back(const T&);
+
+  T pop_front();
+  T pop_back();
+
+  size_t size() { return _size; }
+  bool empty() const { return _size == 0; }
+private:
+  struct Node {
+    T data;
+    Node* prev;
+    Node* next;
+
+    Node(T d = T(), Node* p = nullptr, Node* n = nullptr) 
+      : data(d), prev(p), next(n) {}
+  };
+
+private:
+  Node* front;
+  Node* rear;
+  size_t _size;
+};
+
+
+template<typename T>
+Deque<T>::~Deque() {
+  while(front->next != rear) {
+    Node* tmp = front->next;
+    front->next = front->next->next;
+    delete tmp;
+  }
+  delete front;
+  delete rear;
+}
+
+template<typename T>
+void Deque<T>::push_front(const T& x) {
+  front->next->prev = new Node(x, front, front->next);
+  front->next = front->next->prev;
+  ++_size;
+}
+
+template<typename T>
+void Deque<T>::push_back(const T& x) {
+  rear->prev->next = new Node(x, rear->prev, rear);
+  rear->prev = rear->prev->next;
+  ++_size;
+}
+
+template<typename T>
+T Deque<T>::pop_front() {
+  assert(front->next != rear);
+  T value = front->next->data;
+  Node* nextnext = front->next->next;
+  delete front->next;
+
+  front->next = nextnext;
+  nextnext->prev = front;
+  --_size;
+  return value;
+}
+
+template<typename T>
+T Deque<T>::pop_back() {
+  assert(rear->prev != front);
+  T value = rear->prev->data;
+  Node* prevprev = rear->prev->prev;
+  delete rear->prev;
+
+  rear->prev = prevprev;
+  prevprev->next = rear;
+  --_size;
+  return value;
 }
 
 
 int main() {
 
-  std::cout << "intersection and union\n-------------------------\n";
-  List<int>* set1 = new Set<int>;
-  List<int>* set2 = new Set<int>;
-  List<int>* result = new Set<int>;
+  std::unique_ptr<Deque<int>> deque(new Deque<int>);
 
+  std::cout << "is empty? " << std::boolalpha << deque->empty()
+    << "\nsize: " << deque->size();
+  
   int number = 0;
   while(number <= 0) {
-    std::cout << "\nenter the number of elements in set 1: ";
+    std::cout << "\n\nenter element size to insert: ";
     std::cin >> number;
   }
-
   int current;
   for(int i = 0; i < number; ++i) {
-    std::cout << "set1[" << i << "] = ";
+    std::cout << "deque[" << i << "] = ";
     std::cin >> current;
-    set1->insert(current);
+    i % 2 == 0 ? deque->push_front(current) : deque->push_back(current);
   }
 
-  std::cout << "\nset1: ";
-  print_list(set1);
-
-  for(number = 0; number <= 0; ) {
-    std::cout << "\n\nenter the number of elements in set 2: ";
-    std::cin >> number;
-  }
-  for(int i = 0; i < number; ++i) {
-    std::cout << "set2[" << i << "] = ";
-    std::cin >> current;
-    set2->insert(current);
-  }
-
-  std::cout << "\nset2: ";
-  print_list(set2);
-
-  get_intersection(set1, set2, result);
-  std::cout << "\n\nset1 & set2 intersection: ";
-  print_list(result);
-
-  result->clear();
   
-  get_union(set1, set2, result);
-  std::cout << "\n\nset1 and set2 union: ";
-  print_list(result);
+  while(!deque->empty()) {
+    const size_t size = deque->size();
+    std::cout << (size % 2 == 0 ? deque->pop_back() : deque->pop_front()) << " ";
+  }
 
   std::cin.get();
   std::cin.get();
