@@ -80,7 +80,6 @@ bool Set<T>::insert(const T& x) {
       newNode->next = current;
     }
   }
-  current = head->next;
   ++size;
   return true;
 }

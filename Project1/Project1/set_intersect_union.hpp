@@ -22,9 +22,7 @@ void get_intersection(List<T>* set1, List<T>* set2, List<T>* result) {
       set2->next();
       ++count2;
     } else {
-      if(result->empty()) {
-        result->insert(set1->get_value());
-      } else if(!find(result, set1->get_value())) {
+      if(result->empty() || !find(result, set1->get_value())) {
         result->insert(set1->get_value());
       }
       set1->next();
@@ -63,9 +61,7 @@ void get_union(List<T>* set1, List<T>* set2, List<T>* result) {
       ++count2;
     }
 
-    if(result->empty()) {
-      result->insert(value);
-    } else if(!find(result, value)) {
+    if(result->empty() || !find(result, value)) {
       result->insert(value);
     }
   }
@@ -88,8 +84,15 @@ void get_union(List<T>* set1, List<T>* set2, List<T>* result) {
 
 template <typename T>
 bool find(List<T>* set, const T& value) {
-  if(value == set->get_value()) {
-    return true;
+  set->move_to_start();
+  set->next();
+  const size_t size = set->get_size();
+  for(int i = 0; i < size; ++i) {
+    if(value == set->get_value()) {
+      set->next();
+      return true;
+    }
+    set->next();
   }
   return false;
 }
