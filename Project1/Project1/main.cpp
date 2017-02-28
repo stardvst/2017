@@ -1,119 +1,89 @@
 #include <iostream>
-#include <cassert>
-#include <memory>
+#include <vector>
 
 
-template<typename T>
-class Deque {
-public:
-  Deque() : front(new Node), rear(new Node) { 
-    front->next = rear; 
-    rear->prev = front; 
+size_t merge_and_count(std::vector<int>& arr, 
+                       std::vector<int>& tmp,
+                       size_t low, size_t mid, size_t high) {
+  size_t i = low;
+  size_t j = mid + 1;
+  size_t k = low;
+
+  size_t count = 0;
+
+  while(i <= mid && j <= high) {
+    if(arr[i] <= arr[j]) {
+      tmp[k++] = arr[i++];
+    } else {
+      tmp[k++] = arr[j++];
+      count += mid + 1 - i;
+    }
   }
-  ~Deque();
 
-  void push_front(const T&);
-  void push_back(const T&);
-
-  T pop_front();
-  T pop_back();
-
-  size_t size() { return _size; }
-  bool empty() const { return _size == 0; }
-private:
-  struct Node {
-    T data;
-    Node* prev;
-    Node* next;
-
-    Node(T d = T(), Node* p = nullptr, Node* n = nullptr) 
-      : data(d), prev(p), next(n) {}
-  };
-
-private:
-  Node* front;
-  Node* rear;
-  size_t _size;
-};
-
-
-template<typename T>
-Deque<T>::~Deque() {
-  while(front->next != rear) {
-    Node* tmp = front->next;
-    front->next = front->next->next;
-    delete tmp;
+  while(i <= mid) {
+    tmp[k++] = arr[i++];
   }
-  delete front;
-  delete rear;
+  while(j <= high) {
+    tmp[k++] = arr[j++];
+  }
+
+  for(size_t t = low; t <= high; ++t) {
+    arr[t] = tmp[t];
+  }
+
+  return count;
 }
 
-template<typename T>
-void Deque<T>::push_front(const T& x) {
-  front->next->prev = new Node(x, front, front->next);
-  front->next = front->next->prev;
-  ++_size;
+size_t sort_and_count(std::vector<int>& arr, 
+                      std::vector<int>& tmp, 
+                      size_t low, size_t high) {
+  if(low < high) {
+    size_t mid = low + (high - low) / 2;
+
+    size_t X = sort_and_count(arr, tmp, low, mid);
+    size_t Y = sort_and_count(arr, tmp, mid + 1, high);
+    size_t Z = merge_and_count(arr, tmp, low, mid, high);
+
+    return X + Y + Z;
+  }
+
+  return 0;
 }
 
-template<typename T>
-void Deque<T>::push_back(const T& x) {
-  rear->prev->next = new Node(x, rear->prev, rear);
-  rear->prev = rear->prev->next;
-  ++_size;
-}
-
-template<typename T>
-T Deque<T>::pop_front() {
-  assert(front->next != rear);
-  T value = front->next->data;
-  Node* nextnext = front->next->next;
-  delete front->next;
-
-  front->next = nextnext;
-  nextnext->prev = front;
-  --_size;
-  return value;
-}
-
-template<typename T>
-T Deque<T>::pop_back() {
-  assert(rear->prev != front);
-  T value = rear->prev->data;
-  Node* prevprev = rear->prev->prev;
-  delete rear->prev;
-
-  rear->prev = prevprev;
-  prevprev->next = rear;
-  --_size;
-  return value;
+size_t sort_and_count(std::vector<int>& arr) {
+  std::vector<int> tmp(arr.size());
+  return sort_and_count(arr, tmp, 0, arr.size() - 1);
 }
 
 
 int main() {
 
-  std::unique_ptr<Deque<int>> deque(new Deque<int>);
+  std::vector<int> arr;
 
-  std::cout << "is empty? " << std::boolalpha << deque->empty()
-    << "\nsize: " << deque->size();
-  
   int number = 0;
   while(number <= 0) {
-    std::cout << "\n\nenter element size to insert: ";
+    std::cout << "enter number of elements: ";
     std::cin >> number;
   }
+
   int current;
   for(int i = 0; i < number; ++i) {
-    std::cout << "deque[" << i << "] = ";
+    std::cout << "arr[0] = ";
     std::cin >> current;
-    i % 2 == 0 ? deque->push_front(current) : deque->push_back(current);
+    arr.push_back(current);
   }
 
-  
-  while(!deque->empty()) {
-    const size_t size = deque->size();
-    std::cout << (size % 2 == 0 ? deque->pop_back() : deque->pop_front()) << " ";
+  std::cout << "\narr: ";
+  for(std::vector<int>::const_iterator it = arr.begin(); it != arr.end(); ++it) {
+    std::cout << *it << " ";
   }
+  
+  std::cout << "\n\nnumber of inversions: " << sort_and_count(arr);
+
 
   std::cin.get();
   std::cin.get();
 }
+
+
+
