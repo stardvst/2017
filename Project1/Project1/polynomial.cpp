@@ -28,8 +28,7 @@ void Polynomial::add_term(int coeff, int exp) {
   while(tmp->next && tmp->next->exp >= exp) {
     tmp = tmp->next;
   }
-  if(tmp == first) { // first has exp=0 => checking tmp->exp==exp for it 
-                     // can be wrong (when first inserted term has exp=0)
+  if(tmp == first) {
     tmp->next = new Term(coeff, exp, tmp->next);
   } else if(tmp->exp == exp) {
     tmp->coeff += coeff;

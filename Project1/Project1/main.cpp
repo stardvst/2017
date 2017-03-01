@@ -12,6 +12,7 @@ int main() {
     std::cout << "enter the number of terms in polynomial 1: ";
     std::cin >> number;
   }
+
   std::cout << '\n';
   for(int i = 0; i < number; ++i) {
     std::cout << "p1[" << i << "] coeff = ";
