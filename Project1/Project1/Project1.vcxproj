@@ -113,10 +113,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="polynomial.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="polynomial.hpp" />
+    <ClInclude Include="LStack.hpp" />
+    <ClInclude Include="make_stack.hpp" />
+    <ClInclude Include="Stack.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

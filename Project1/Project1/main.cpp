@@ -1,53 +1,46 @@
 #include <iostream>
-#include "polynomial.hpp"
+#include "LStack.hpp"
+#include "make_stack.hpp"
 
 
 int main() {
 
-  Polynomial p1;
-  Polynomial p2;
+  LStack<int>* stack1 = new LStack<int>;
+  LStack<int>* stack2 = new LStack<int>;
 
-  int number = 0, coeff, exp;
+  int number = 0;
   while(number <= 0) {
-    std::cout << "enter the number of terms in polynomial 1: ";
+    std::cout << "enter stack1 size: ";
     std::cin >> number;
   }
-
-  std::cout << '\n';
+  int current;
   for(int i = 0; i < number; ++i) {
-    std::cout << "p1[" << i << "] coeff = ";
-    std::cin >> coeff;
-    std::cout << "p1[" << i << "] exp = ";
-    std::cin >> exp;
-    p1.add_term(coeff, exp);
-    std::cout << '\n';
+    std::cout << "stack1[" << i << "] = ";
+    std::cin >> current;
+    stack1->push(current);
   }
 
   for(number = 0; number <= 0; ) {
-    std::cout << "\nenter the number of terms in polynomial 2: ";
+    std::cout << "\nenter stack2 size: ";
     std::cin >> number;
   }
-  std::cout << '\n';
   for(int i = 0; i < number; ++i) {
-    std::cout << "p2[" << i << "] coeff = ";
-    std::cin >> coeff;
-    std::cout << "p2[" << i << "] exp = ";
-    std::cin >> exp;
-    p2.add_term(coeff, exp);
-    std::cout << '\n';
+    std::cout << "stack2[" << i << "] = ";
+    std::cin >> current;
+    stack1->push(current);
   }
 
-  std::cout << "-----------------------\n";
-  std::cout << "p1 = " << p1 << "\np2 = " << p2 << '\n';
+  LStack<int>* result = new LStack<int>;
+  make_stack(stack1, stack2, result);
 
-  std::cout << "-----------------------\n";
-  Polynomial p3 = p1 + p2;
-  std::cout << "p1 + p2 = " << p3 << '\n';
+  std::cout << '\n';
+  while(!result->empty()) {
+    std::cout << result->top() << ' ';
+    result->pop();
+  }
 
-  Polynomial p4 = p1 - p2;
-  std::cout << "p1 - p2 = " << p4 << std::endl;
 
-
+  std::cin.get();
   std::cin.get();
   return 0;
 }

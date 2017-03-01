@@ -1,6 +1,7 @@
 #ifndef LSTACK_HPP
 #define LSTACK_HPP
 
+#include <cassert>
 #include "Stack.hpp"
 
 
