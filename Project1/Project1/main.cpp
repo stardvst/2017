@@ -27,7 +27,7 @@ int main() {
   for(int i = 0; i < number; ++i) {
     std::cout << "stack2[" << i << "] = ";
     std::cin >> current;
-    stack1->push(current);
+    stack2->push(current);
   }
 
   LStack<int>* result = new LStack<int>;
