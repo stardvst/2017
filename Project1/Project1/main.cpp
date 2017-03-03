@@ -2,17 +2,19 @@
 #include <vector>
 
 
-void insertion_sort(std::vector<int>& A) {
-  for(int i = 1; i < A.size(); ++i) {
-    int key = A[i];
-    int j = i - 1;
+void selection_sort(std::vector<int>& A) {
+  for(int i = 0; i < A.size() - 1; ++i) {
+    int min = i;
 
-    while(j >= 0 && A[j] > key) {
-      A[j + 1] = A[j];
-      j = j - 1;
+    for(int j = i + 1; j < A.size(); ++j) {
+      if(A[j] < A[min]) {
+        min = j;
+      }
     }
 
-    A[j + 1] = key;
+    int tmp = A[i];
+    A[i] = A[min];
+    A[min] = tmp;
   }
 }
 
@@ -28,7 +30,7 @@ int main() {
     A.push_back(current);
   }
 
-  insertion_sort(A);
+  selection_sort(A);
 
   std::cout << "\nsorted array: ";
   for(int i = 0; i < 7; ++i) {
