@@ -1,44 +1,39 @@
 #include <iostream>
-#include "LStack.hpp"
-#include "make_stack.hpp"
+#include <vector>
+
+
+void insertion_sort(std::vector<int>& A) {
+  for(int i = 1; i < A.size(); ++i) {
+    int key = A[i];
+    int j = i - 1;
+
+    while(j >= 0 && A[j] > key) {
+      A[j + 1] = A[j];
+      j = j - 1;
+    }
+
+    A[j + 1] = key;
+  }
+}
 
 
 int main() {
 
-  LStack<int>* stack1 = new LStack<int>;
-  LStack<int>* stack2 = new LStack<int>;
+  std::vector<int> A;
 
-  int number = 0;
-  while(number <= 0) {
-    std::cout << "enter stack1 size: ";
-    std::cin >> number;
-  }
-  int current;
-  for(int i = 0; i < number; ++i) {
-    std::cout << "stack1[" << i << "] = ";
+  for(int i = 0; i < 7; ++i) {
+    int current;
+    std::cout << "A[" << i << "] = ";
     std::cin >> current;
-    stack1->push(current);
+    A.push_back(current);
   }
 
-  for(number = 0; number <= 0; ) {
-    std::cout << "\nenter stack2 size: ";
-    std::cin >> number;
-  }
-  for(int i = 0; i < number; ++i) {
-    std::cout << "stack2[" << i << "] = ";
-    std::cin >> current;
-    stack2->push(current);
-  }
+  insertion_sort(A);
 
-  LStack<int>* result = new LStack<int>;
-  make_stack(stack1, stack2, result);
-
-  std::cout << '\n';
-  while(!result->empty()) {
-    std::cout << result->top() << ' ';
-    result->pop();
+  std::cout << "\nsorted array: ";
+  for(int i = 0; i < 7; ++i) {
+    std::cout << A[i] << ' ';
   }
-
 
   std::cin.get();
   std::cin.get();
