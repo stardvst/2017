@@ -29,9 +29,7 @@ void Polynomial::add_term(int coeff, int exp) {
   while(tmp->next && tmp->next->exp >= exp) {
     tmp = tmp->next;
   }
-  if(tmp == first) {
-    tmp->next = new Term(coeff, exp, tmp->next);
-  } else if(tmp->exp == exp) {
+  if(tmp != first && tmp->exp == exp) {
     tmp->coeff += coeff;
   } else {
     tmp->next = new Term(coeff, exp, tmp->next);
@@ -55,7 +53,7 @@ std::ostream& operator<<(std::ostream& out, const Polynomial& p) {
       } else if(term_count > 0) {
         out << " + ";
       }
-      
+
       if(coeff == 1 && tmp->exp == 0) {
         out << "1";
       }
@@ -66,7 +64,7 @@ std::ostream& operator<<(std::ostream& out, const Polynomial& p) {
       }
 
       int exp = tmp->exp;
-      if(exp != 0) {      
+      if(exp != 0) {
         out << "x";
         if(exp > 1) {
           out << "^" << exp;
