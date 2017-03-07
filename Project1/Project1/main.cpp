@@ -1,84 +1,82 @@
 #include <iostream>
+#include <numeric>
 #include <vector>
+#include <tuple>
 
 
-void insertion_sort(std::vector<int>& A, int index) {
-  if(index == 0) return;
-
-  insertion_sort(A, index - 1);
-
-  int key = A[index];
-  while(index - 1 >= 0 && A[index - 1] > key) {
-    A[index] = A[index - 1];
-    index = index - 1;
-  }
-  A[index] = key;
-}
-
-
-int binary_search(const std::vector<int>& A, int key, int start, int end) {
-  if(start <= end) {
-    int mid = (start + end) / 2;
-    if(key == A[mid]) return mid;
-
-    if(key > A[mid]) {
-      return binary_search(A, key, mid + 1, end);
-    } else {
-      return binary_search(A, key, start, mid - 1);
+std::tuple<int, int, int> find_max_crossing_subarray(
+  const std::vector<int>& A, int low, int mid, int high) {
+  int left_sum = std::numeric_limits<int>::min();
+  int sum = 0;
+  int max_left;
+  for(auto i = mid; i >= low; --i) {
+    sum += A[i];
+    if(sum > left_sum) {
+      left_sum = sum;
+      max_left = i;
     }
   }
 
-  return -1;
-}
-
-int binary_search(const std::vector<int>& A, int key) {
-  int start = 0;
-  int end = static_cast<int>(A.size());
-
-  while(start <= end) {
-    int mid = (start + end) / 2;
-
-    if(key == A[mid]) return mid;
-
-    if(key > A[mid]) {
-      start = mid + 1;
-    } else {
-      end = mid - 1;
+  int right_sum = std::numeric_limits<int>::min();
+  sum = 0;
+  int max_right;
+  for(auto j = mid + 1; j <= high; ++j) {
+    sum += A[j];
+    if(sum > right_sum) {
+      right_sum = sum;
+      max_right = j;
     }
   }
 
-  return -1;
+  return std::make_tuple(max_left, max_right, left_sum + right_sum);
 }
+
+
+std::tuple<int, int, int> find_max_subarray(
+  const std::vector<int>& A, int low, int high) {
+  if(high == low) {
+    return std::make_tuple(low, high, A[low]);
+  }
+
+  int mid = low + (high - low) / 2;
+  std::tuple<int, int, int> left = find_max_subarray(A, low, mid);
+  std::tuple<int, int, int> right = find_max_subarray(A, mid + 1, high);
+  std::tuple<int, int, int> cross = find_max_crossing_subarray(A, low, mid, high);
+
+  if(std::get<2>(left) >= std::get<2>(right) && std::get<2>(left) >= std::get<2>(cross)) {
+    return left;
+  } else if(std::get<2>(right) >= std::get<2>(left) && std::get<2>(right) >= std::get<2>(cross)) {
+    return right;
+  } else {
+    return cross;
+  }
+}
+
 
 
 int main() {
 
   std::vector<int> A;
 
-  int number = 0;
-  while(number <= 0) {
-    std::cout << "enter the numbers of the array: ";
-    std::cin >> number;
+  int size = 0;
+  while(size <= 0) {
+    std::cout << "enter vector size: ";
+    std::cin >> size;
   }
-  for(int i = 0; i < number; ++i) {
+
+  for(auto i = 0; i < size; ++i) {
     int current;
     std::cout << "A[" << i << "] = ";
     std::cin >> current;
     A.push_back(current);
   }
 
-  insertion_sort(A, number - 1);
+  std::tuple<int, int, int> max = find_max_subarray(A, 0, static_cast<int>(A.size() - 1));
 
-  std::cout << "\nsorted array: ";
-  for(int i = 0; i < number; ++i) {
-    std::cout << A[i] << ' ';
-  }
+  std::cout << "\nmax sum: " << std::get<2>(max)
+    << ", residing between indices " << std::get<0>(max)
+    << " and " << std::get<1>(max) << std::endl;
 
-  int key;
-  std::cout << "\n\nenter a key to search for: ";
-  std::cin >> key;
-  std::cout << key << " is at index " << binary_search(A, key, 0, number - 1) << 
-    " (recursive), " << binary_search(A, key) << " (iterative)";
 
   std::cin.get();
   std::cin.get();
