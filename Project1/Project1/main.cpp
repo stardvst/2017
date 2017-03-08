@@ -53,6 +53,48 @@ std::tuple<int, int, int> find_max_subarray(
 }
 
 
+std::tuple<int, int, int> brute_force(const std::vector<int>& A) {
+  int sum = 0;
+  int max_sum = std::numeric_limits<int>::min();
+  int max_left;
+  int max_right;
+
+  for(auto i = 0; i < static_cast<int>(A.size()); ++i) {
+    for(auto j = i + 1; j < static_cast<int>(A.size()); ++j) {
+      sum += A[j];
+      if(sum > max_sum) {
+        max_sum = sum;
+        max_left = i;
+        max_right = j;
+      }
+    }
+    sum = 0;
+  }
+
+  return std::make_tuple(max_left, max_right, max_sum);
+}
+
+std::tuple<int, int, int> linear(const std::vector<int>& A) {
+  int max_sum = std::numeric_limits<int>::min();
+  int sum = 0;
+  int max_left;
+  int max_right;
+  int index = 0;
+
+  for(auto i = 0; i < A.size(); ++i) {
+    sum += A[i];
+    if(sum < 0) {
+      sum = 0;
+      index = i + 1;
+    } else if(sum > max_sum) {
+      max_sum = sum;
+      max_left = index;
+      max_right = i;
+    }
+  }
+  return std::make_tuple(max_left, max_right, max_sum);
+}
+
 
 int main() {
 
@@ -71,12 +113,13 @@ int main() {
     A.push_back(current);
   }
 
-  std::tuple<int, int, int> max = find_max_subarray(A, 0, static_cast<int>(A.size() - 1));
+  //std::tuple<int, int, int> max = find_max_subarray(A, 0, static_cast<int>(A.size() - 1));
+  //std::tuple<int, int, int> max = brute_force(A);
+  std::tuple<int, int, int> max = linear(A);
 
   std::cout << "\nmax sum: " << std::get<2>(max)
     << ", residing between indices " << std::get<0>(max)
     << " and " << std::get<1>(max) << std::endl;
-
 
   std::cin.get();
   std::cin.get();
