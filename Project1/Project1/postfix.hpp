@@ -11,5 +11,4 @@ bool is_operand(char);
 std::string to_postfix(const std::string&);
 void evaluate(const std::string&);
 
-
 #endif // !POSTFIX_HPP

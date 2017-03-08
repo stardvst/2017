@@ -35,6 +35,7 @@ bool is_variable(char c) {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
+
 std::string to_postfix(const std::string& infix) {
   if(!balanced(infix)) {
     std::cerr << "\nthe expression is unbalanced.\n";
