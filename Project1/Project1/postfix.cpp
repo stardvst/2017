@@ -83,7 +83,6 @@ std::string to_postfix(const std::string& infix) {
   return postfix;
 }
 
-
 void evaluate(const std::string& postfix) {
   LStack<double> operands;
 
