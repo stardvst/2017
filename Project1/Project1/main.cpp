@@ -1,92 +1,102 @@
 #include <iostream>
 #include <cassert>
-#include <stack>
+#include <queue>
 
 
-class Queue {
+class Stack {
 public:
-  void enqueue(int);
-  void dequeue();
-  int front() const;
+  void push(int);
+  void pop();
+  int top() const;
   size_t size() const;
   bool empty() const;
 private:
-  mutable std::stack<int> input;
-  mutable std::stack<int> output;
+  mutable std::queue<int> queue1;
+  mutable std::queue<int> queue2;
 };
 
 
-void Queue::enqueue(int x) {
-  input.push(x);
+void Stack::push(int x) {
+  queue1.push(x);
 }
 
-void Queue::dequeue() {
-  if(output.empty()) {
-    while(!input.empty()) {
-      output.push(input.top());
-      input.pop();
+void Stack::pop() {
+  if(!queue1.empty()) {
+    while(queue1.size() != 1) {
+      queue2.push(queue1.front());
+      queue1.pop();
     }
+    queue1.pop();
   } else {
-    output.pop();
+    while(queue2.size() != 1) {
+      queue1.push(queue2.front());
+      queue2.pop();
+    }
+    queue2.pop();
   }
 }
 
-int Queue::front() const {
-  if(output.empty()) {
-    while(!input.empty()) {
-      output.push(input.top());
-      input.pop();
-    }
-    if(!output.empty()) {
-      return output.top();
+int Stack::top() const {
+  int value = 0;
+
+  if(!queue1.empty()) {
+    while(!queue1.empty()) {
+      value = queue1.front();
+      queue2.push(value);
+      queue1.pop();
     }
   } else {
-    return output.top();
+    while(!queue2.empty()) {
+      value = queue2.front();
+      queue1.push(value);
+      queue2.pop();
+    }
   }
 
-  return -1;
+  return value;
 }
 
-size_t Queue::size() const {
-  return input.size() + output.size();
+size_t Stack::size() const {
+  return queue1.size() + queue2.size();
 }
 
-bool Queue::empty() const {
-  return input.empty() && output.empty();
+bool Stack::empty() const {
+  return queue1.empty() && queue2.empty();
 }
+
 
 
 int main() {
 
   int size = 0;
   while(size <= 0) {
-    std::cout << "enter queue size: ";
+    std::cout << "enter stack size: ";
     std::cin >> size;
   }
 
-  Queue queue;
+  Stack stack;
 
   std::cout << std::boolalpha;
-  std::cout << "\nsize: " << queue.size() << '\n'
-    << "is empty: " << queue.empty() << "\n\n";
+  std::cout << "\nsize: " << stack.size() << '\n'
+    << "is empty: " << stack.empty() << "\n\n";
 
-  std::cout << "enter queue elements:\n";
+  std::cout << "enter stack elements:\n";
   int current;
   for(int i = 0; i < size; ++i) {
-    std::cout << "queue[" << i << "] = ";
+    std::cout << "stack[" << i << "] = ";
     std::cin >> current;
-    queue.enqueue(current);
+    stack.push(current);
   }
 
-  std::cout << "\nsize: " << queue.size() << '\n'
-    << "is empty: " << queue.empty() << "\n\n";
+  std::cout << "\nsize: " << stack.size() << '\n'
+    << "is empty: " << stack.empty() << "\n\n";
 
-  std::cout << "queue: ";
-  while(!queue.empty()) {
-    std::cout << queue.front() << ' ';
-    queue.dequeue();
+  std::cout << "stack: ";
+  while(!stack.empty()) {
+    std::cout << stack.top() << ' ';
+    stack.pop();
   }
-  
+
   std::cout << std::endl;
 
   std::cin.get();
