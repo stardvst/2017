@@ -1,47 +1,93 @@
 #include <iostream>
-#include <vector>
+#include <cassert>
+#include <stack>
 
 
-int partition(std::vector<int>& A, int low, int high) {
-  int pivot = A[high];
-  int i = low - 1;
-  for(int j = low; j < high; ++j) {
-    if(A[j] <= pivot) {
-      ++i;
-      std::swap(A[i], A[j]);
-    }
-  }
-  std::swap(A[i + 1], A[high]);
-  return i + 1;
+class Queue {
+public:
+  void enqueue(int);
+  void dequeue();
+  int front() const;
+  size_t size() const;
+  bool empty() const;
+private:
+  mutable std::stack<int> input;
+  mutable std::stack<int> output;
+};
+
+
+void Queue::enqueue(int x) {
+  input.push(x);
 }
 
-
-void quicksort(std::vector<int>& A, int low, int high) {
-  if(low < high) {
-    int q = partition(A, low, high);
-    quicksort(A, low, q - 1);
-    quicksort(A, q + 1, high);
+void Queue::dequeue() {
+  if(output.empty()) {
+    while(!input.empty()) {
+      output.push(input.top());
+      input.pop();
+    }
+  } else {
+    output.pop();
   }
+}
+
+int Queue::front() const {
+  if(output.empty()) {
+    while(!input.empty()) {
+      output.push(input.top());
+      input.pop();
+    }
+    if(!output.empty()) {
+      return output.top();
+    }
+  } else {
+    return output.top();
+  }
+
+  return -1;
+}
+
+size_t Queue::size() const {
+  return input.size() + output.size();
+}
+
+bool Queue::empty() const {
+  return input.empty() && output.empty();
 }
 
 
 int main() {
 
-  std::vector<int> A;
+  int size = 0;
+  while(size <= 0) {
+    std::cout << "enter queue size: ";
+    std::cin >> size;
+  }
 
-  for(int i = 0; i < 6; ++i) {
-    int current;
-    std::cout << "A[" << i << "] = ";
+  Queue queue;
+
+  std::cout << std::boolalpha;
+  std::cout << "\nsize: " << queue.size() << '\n'
+    << "is empty: " << queue.empty() << "\n\n";
+
+  std::cout << "enter queue elements:\n";
+  int current;
+  for(int i = 0; i < size; ++i) {
+    std::cout << "queue[" << i << "] = ";
     std::cin >> current;
-    A.push_back(current);
+    queue.enqueue(current);
   }
 
-  quicksort(A, 0, static_cast<int>(A.size() - 1));
+  std::cout << "\nsize: " << queue.size() << '\n'
+    << "is empty: " << queue.empty() << "\n\n";
 
-  std::cout << "\nsorted array: ";
-  for(int i = 0; i < 6; ++i) {
-    std::cout << A[i] << ' ';
+  std::cout << "queue: ";
+  while(!queue.empty()) {
+    std::cout << queue.front() << ' ';
+    queue.dequeue();
   }
+  
+  std::cout << std::endl;
 
   std::cin.get();
   std::cin.get();
