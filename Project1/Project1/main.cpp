@@ -11,57 +11,34 @@ public:
   size_t size() const;
   bool empty() const;
 private:
-  mutable std::queue<int> queue1;
-  mutable std::queue<int> queue2;
+  std::queue<int> queue;
 };
 
 
-void Stack::push(int x) {
-  queue1.push(x);
-}
-
-void Stack::pop() {
-  if(!queue1.empty()) {
-    while(queue1.size() != 1) {
-      queue2.push(queue1.front());
-      queue1.pop();
-    }
-    queue1.pop();
-  } else {
-    while(queue2.size() != 1) {
-      queue1.push(queue2.front());
-      queue2.pop();
-    }
-    queue2.pop();
+void Stack::push(int x) { // O(n)
+  queue.push(x);
+  for(size_t i = 0; i < queue.size() - 1; ++i) {
+    queue.push(queue.front());
+    queue.pop();
   }
 }
 
-int Stack::top() const {
-  int value = 0;
-
-  if(!queue1.empty()) {
-    while(!queue1.empty()) {
-      value = queue1.front();
-      queue2.push(value);
-      queue1.pop();
-    }
-  } else {
-    while(!queue2.empty()) {
-      value = queue2.front();
-      queue1.push(value);
-      queue2.pop();
-    }
-  }
-
-  return value;
+void Stack::pop() { // O(1)
+  assert(!queue.empty());
+  queue.pop();
 }
 
-size_t Stack::size() const {
-  return queue1.size() + queue2.size();
+int Stack::top() const { // O(1)
+  assert(!queue.empty());
+  return queue.front();
 }
 
-bool Stack::empty() const {
-  return queue1.empty() && queue2.empty();
+size_t Stack::size() const { // O(1)
+  return queue.size();
+}
+
+bool Stack::empty() const { // O(1)
+  return queue.empty();
 }
 
 
