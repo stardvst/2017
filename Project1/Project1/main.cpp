@@ -1,80 +1,63 @@
+#include <algorithm>
 #include <iostream>
-#include <cassert>
-#include <queue>
-
-
-class Stack {
-public:
-  void push(int);
-  void pop();
-  int top() const;
-  size_t size() const;
-  bool empty() const;
-private:
-  std::queue<int> queue;
-};
-
-
-void Stack::push(int x) { // O(n)
-  queue.push(x);
-  for(size_t i = 0; i < queue.size() - 1; ++i) {
-    queue.push(queue.front());
-    queue.pop();
-  }
-}
-
-void Stack::pop() { // O(1)
-  assert(!queue.empty());
-  queue.pop();
-}
-
-int Stack::top() const { // O(1)
-  assert(!queue.empty());
-  return queue.front();
-}
-
-size_t Stack::size() const { // O(1)
-  return queue.size();
-}
-
-bool Stack::empty() const { // O(1)
-  return queue.empty();
-}
-
+#include <iomanip>
+#include <vector>
+#include <list>
+#include "clustering.hpp"
 
 
 int main() {
 
   int size = 0;
   while(size <= 0) {
-    std::cout << "enter stack size: ";
+    std::cout << "enter data size: ";
     std::cin >> size;
   }
 
-  Stack stack;
+  std::vector<int> data(size);
 
-  std::cout << std::boolalpha;
-  std::cout << "\nsize: " << stack.size() << '\n'
-    << "is empty: " << stack.empty() << "\n\n";
-
-  std::cout << "enter stack elements:\n";
-  int current;
   for(int i = 0; i < size; ++i) {
-    std::cout << "stack[" << i << "] = ";
-    std::cin >> current;
-    stack.push(current);
+    int element;
+    std::cout << "data[" << i << "] = ";
+    std::cin >> element;
+    data[i] = element;
   }
 
-  std::cout << "\nsize: " << stack.size() << '\n'
-    << "is empty: " << stack.empty() << "\n\n";
-
-  std::cout << "stack: ";
-  while(!stack.empty()) {
-    std::cout << stack.top() << ' ';
-    stack.pop();
+  int distance = 0;
+  while(distance <= 0) {
+    std::cout << "enter max distance between cluster elements: ";
+    std::cin >> distance;
   }
 
-  std::cout << std::endl;
+  std::sort(data.begin(), data.end());
+  std::vector<std::list<int> > clusters = make_clusters(data, distance);
+
+
+  // output data
+  std::cout << "\n\ndata = [ ";
+  for(int i = 0; i < size - 1; ++i) {
+    std::cout << data[i] << ", ";
+  }
+  std::cout << data[size - 1] << " ]" << '\n';
+  
+  std::cout << "distance: " << distance << "\n\n";
+
+  // output clusters
+  std::cout << "clusters:\n";
+   
+  std::vector<std::list<int> >::const_iterator clusters_end = clusters.end();
+  std::vector<std::list<int> >::const_iterator cluster = clusters.begin();
+  
+  for(int count = 0; cluster != clusters_end; ++cluster) {
+    std::list<int>::const_iterator list_end = --(*cluster).end();
+    std::cout << std::setw(20) << "cluster " << count << ": [ ";
+    for(std::list<int>::const_iterator element = (*cluster).begin(); element != list_end; ++element) {
+      std::cout << *element << ", ";
+    }
+    std::cout << *(--(*cluster).end()) << " ]\n";
+    ++count;
+  }
+ 
 
   std::cin.get();
   std::cin.get();
