@@ -7,6 +7,7 @@
 unsigned short priority(char);
 bool is_operator(char);
 bool is_operand(char);
+bool is_variable(char);
 
 std::string to_postfix(const std::string&);
 void evaluate(const std::string&);
