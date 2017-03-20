@@ -1,58 +1,49 @@
+#include <algorithm>
 #include <iostream>
-#include <cstdlib>
+#include <fstream>
+#include <iomanip>
 #include <vector>
-#include <ctime>
-
-
-int partition(std::vector<int>& A, int low, int high) {
-  int pivot = A[high];
-  int i = low - 1;
-  for(int j = low; j < high; ++j) {
-    if(A[j] <= pivot) {
-      ++i;
-      std::swap(A[i], A[j]);
-    }
-  }
-  std::swap(A[i + 1], A[high]);
-  return i + 1;
-}
-
-int randomized_partition(std::vector<int>& A, int low, int high) {
-  std::srand(static_cast<unsigned int>(std::time(0)));
-  int i = std::rand() % (high - low + 1) + low;
-  std::swap(A[i], A[high]);
-  return partition(A, low, high);
-}
-
-void randomized_quicksort(std::vector<int>& A, int low, int high) {
-  if(low < high) {
-    int q = randomized_partition(A, low, high);
-    randomized_quicksort(A, low, q - 1);
-    randomized_quicksort(A, q + 1, high);
-  }
-}
-
+#include <list>
+#include "clustering.hpp"
 
 
 int main() {
 
-  std::vector<int> A;
+  std::ifstream infile("data.txt");
+  std::vector<int> data;
 
-  for(int i = 0; i < 10; ++i) {
-    int current;
-    std::cout << "A[" << i << "] = ";
-    std::cin >> current;
-    A.push_back(current);
+  int current;
+  while(infile >> current) {
+    data.push_back(current);
   }
 
-  randomized_quicksort(A, 0, static_cast<int>(A.size() - 1));
+  infile.close();
 
-  std::cout << "\nsorted array: ";
-  for(int i = 0; i < 10; ++i) {
-    std::cout << A[i] << ' ';
+
+  std::sort(data.begin(), data.end());
+  Clusters c;
+  std::vector<std::list<int> > clusters = c.make_clusters(data);
+
+  std::ofstream outfile("clusters.txt", std::ios::trunc);
+
+  std::vector<std::list<int> >::const_iterator cluster = clusters.begin();
+  std::vector<std::list<int> >::const_iterator clusters_end = clusters.end();
+
+  for(int count = 0; cluster != clusters_end; ++cluster) {
+    std::list<int>::const_iterator list_end = --(*cluster).end();
+    outfile << "[ ";
+    for(std::list<int>::const_iterator element = (*cluster).begin(); element != list_end; ++element) {
+      outfile << *element << ", ";
+    }
+    outfile << *(--(*cluster).end()) << " ]\n";
+    ++count;
   }
 
-  std::cin.get();
+  outfile.close();
+
+
+  std::cout << "see \"clusters.txt\" for the result";
+
   std::cin.get();
   return 0;
 }

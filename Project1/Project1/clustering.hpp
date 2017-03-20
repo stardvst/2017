@@ -5,6 +5,13 @@
 #include <list>
 
 
-std::vector<std::list<int> > make_clusters(const std::vector<int>&, int);
+class Clusters {
+public:
+  std::vector<std::list<int> > make_clusters(const std::vector<int>&);
+private:
+  int get_distance(const std::vector<int>&);
+private:
+  std::vector<std::list<int> > clusters;
+};
 
 #endif // !CLUSTERING_HPP
