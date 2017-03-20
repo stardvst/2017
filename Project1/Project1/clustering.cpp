@@ -16,8 +16,7 @@ std::vector<std::list<int> > Clusters::make_clusters(const std::vector<int>& dat
     clusters[count].push_back(data[i]); // insert in list
 
     while(i + 1 < size && data[i + 1] <= data[i] + distance) {
-      clusters[count].push_back(data[i + 1]);
-      ++i;
+      clusters[count].push_back(data[++i]);
     }
 
     ++count;
