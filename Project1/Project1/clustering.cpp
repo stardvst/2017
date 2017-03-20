@@ -26,7 +26,7 @@ std::vector<std::list<int> > Clusters::make_clusters(const std::vector<int>& dat
   return clusters;
 }
 
-int Clusters::get_distance(const std::vector<int>& data) {
+int Clusters::get_distance(const std::vector<int>& data) const {
 
   std::vector<int> distances;
   const size_t size = data.size() - 1;

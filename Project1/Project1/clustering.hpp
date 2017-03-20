@@ -9,7 +9,7 @@ class Clusters {
 public:
   std::vector<std::list<int> > make_clusters(const std::vector<int>&);
 private:
-  int get_distance(const std::vector<int>&);
+  int get_distance(const std::vector<int>&) const;
 private:
   std::vector<std::list<int> > clusters;
 };
