@@ -1,48 +1,44 @@
-#include <algorithm>
+#include <exception>
 #include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <vector>
-#include <list>
-#include "clustering.hpp"
+#include "Virtual_memory.hpp"
 
 
 int main() {
 
-  std::ifstream infile("data.txt");
-  std::vector<int> data;
+  Virtual_memory vm;
 
-  int current;
-  while(infile >> current) {
-    data.push_back(current);
+  int add1 = vm.allocate(20);
+  int add2 = vm.allocate(10);
+  int add3 = vm.allocate(5);
+  int add4 = vm.allocate(8);
+  int add5 = vm.allocate(15);
+
+  try {
+    vm.free(add2);
+  } catch(const std::exception& e) {
+    std::cerr << e.what();
   }
 
-  infile.close();
-
-
-  std::sort(data.begin(), data.end());
-  Clusters c;
-  std::vector<std::list<int> > clusters = c.make_clusters(data);
-
-  std::ofstream outfile("clusters.txt", std::ios::trunc);
-
-  std::vector<std::list<int> >::const_iterator cluster = clusters.begin();
-  std::vector<std::list<int> >::const_iterator clusters_end = clusters.end();
-
-  for(int count = 0; cluster != clusters_end; ++cluster) {
-    std::list<int>::const_iterator list_end = --(*cluster).end();
-    outfile << "[ ";
-    for(std::list<int>::const_iterator element = (*cluster).begin(); element != list_end; ++element) {
-      outfile << *element << ", ";
-    }
-    outfile << *(--(*cluster).end()) << " ]\n";
-    ++count;
+  try {
+    vm[add1] = 4;
+    std::cout << static_cast<int>(vm[add1]) << '\n';
+  } catch(const std::exception& e) {
+    std::cerr << e.what();
   }
 
-  outfile.close();
+  try {
+    vm.free(add3);
+  } catch(const std::exception& e) {
+    std::cerr << e.what();
+  }
 
+  try {
+    vm[add3] = 5;
+  } catch(const std::exception& e) {
+    std::cerr << e.what();
+  }
 
-  std::cout << "see \"clusters.txt\" for the result";
+  std::cout << "other available addresses: " << add4 << ", " << add5 << std::endl;
 
   std::cin.get();
   return 0;

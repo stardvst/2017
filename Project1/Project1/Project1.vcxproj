@@ -114,11 +114,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="clustering.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Virtual_memory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="clustering.hpp" />
+    <ClInclude Include="Virtual_memory.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

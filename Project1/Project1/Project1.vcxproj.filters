@@ -18,12 +18,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="clustering.cpp">
+    <ClCompile Include="Virtual_memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="clustering.hpp">
+    <ClInclude Include="Virtual_memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
