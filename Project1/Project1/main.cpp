@@ -5,39 +5,38 @@
 
 int main() {
 
-  int number = 0;
-  while(number <= 0) {
-    std::cout << "enter queue size: ";
-    std::cin >> number;
+  char c;
+  LQueue<char> queue;
+
+  std::cin >> c;
+  while(c != '!') {
+    queue.enqueue(c);
+    std::cin >> c;
   }
 
-  LQueue<int> queue;
+  LStack<char> stack;
+  const size_t size = queue.size() / 2;
 
-  int current;
-  for(int i = 0; i < number; ++i) {
-    std::cout << "queue[" << i << "] = ";
-    std::cin >> current;
-    queue.enqueue(current);
-  }
-
-
-  LStack<int> stack;
-
-  while(!queue.empty()) {
+  for(int i = 0; i < size; ++i) {
     stack.push(queue.front());
     queue.dequeue();
   }
 
-  while(!stack.empty()) {
-    queue.enqueue(stack.top());
-    stack.pop();
-  }
-
-  std::cout << "\nreverse queue: ";
-  while(!queue.empty()) {
-    std::cout << queue.front() << ' ';
+  if(queue.size() & 1) {
     queue.dequeue();
   }
+
+  bool flag = true;
+  while(!stack.empty()) {
+    if(stack.top() != queue.front()) {
+      flag = false;
+      break;
+    }
+    stack.pop();
+    queue.dequeue();
+  }
+
+  std::cout << "is palindrome: " << std::boolalpha << flag << std::endl;
 
   std::cin.get();
   std::cin.get();
