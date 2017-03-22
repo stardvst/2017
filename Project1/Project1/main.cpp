@@ -1,45 +1,45 @@
-#include <exception>
 #include <iostream>
-#include "Virtual_memory.hpp"
+#include "LStack.hpp"
+#include "LQueue.hpp"
 
 
 int main() {
 
-  Virtual_memory vm;
-
-  int add1 = vm.allocate(20);
-  int add2 = vm.allocate(10);
-  int add3 = vm.allocate(5);
-  int add4 = vm.allocate(8);
-  int add5 = vm.allocate(15);
-
-  try {
-    vm.free(add2);
-  } catch(const std::exception& e) {
-    std::cerr << e.what();
+  int number = 0;
+  while(number <= 0) {
+    std::cout << "enter queue size: ";
+    std::cin >> number;
   }
 
-  try {
-    vm[add1] = 4;
-    std::cout << static_cast<int>(vm[add1]) << '\n';
-  } catch(const std::exception& e) {
-    std::cerr << e.what();
+  LQueue<int> queue;
+
+  int current;
+  for(int i = 0; i < number; ++i) {
+    std::cout << "queue[" << i << "] = ";
+    std::cin >> current;
+    queue.enqueue(current);
   }
 
-  try {
-    vm.free(add3);
-  } catch(const std::exception& e) {
-    std::cerr << e.what();
+
+  LStack<int> stack;
+
+  while(!queue.empty()) {
+    stack.push(queue.front());
+    queue.dequeue();
   }
 
-  try {
-    vm[add3] = 5;
-  } catch(const std::exception& e) {
-    std::cerr << e.what();
+  while(!stack.empty()) {
+    queue.enqueue(stack.top());
+    stack.pop();
   }
 
-  std::cout << "other available addresses: " << add4 << ", " << add5 << std::endl;
+  std::cout << "\nreverse queue: ";
+  while(!queue.empty()) {
+    std::cout << queue.front() << ' ';
+    queue.dequeue();
+  }
 
+  std::cin.get();
   std::cin.get();
   return 0;
 }

@@ -115,10 +115,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Virtual_memory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Virtual_memory.hpp" />
+    <ClInclude Include="LQueue.hpp" />
+    <ClInclude Include="LStack.hpp" />
+    <ClInclude Include="Queue.hpp" />
+    <ClInclude Include="Stack.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
