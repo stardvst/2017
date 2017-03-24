@@ -15,14 +15,14 @@ int main() {
   }
 
   LStack<char> stack;
-  const size_t size = queue.size() / 2;
+  const size_t size = queue.size();
 
-  for(int i = 0; i < size; ++i) {
+  for(int i = 0; i < size / 2; ++i) {
     stack.push(queue.front());
     queue.dequeue();
   }
 
-  if(queue.size() & 1) {
+  if(size & 1) {
     queue.dequeue();
   }
 
