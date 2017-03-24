@@ -19,7 +19,7 @@ private:
   int v_next_addr;
   int p_next_addr;
   char p_mem[1024];
-  std::map<int, std::pair<int, int> > table;
+  std::map<int, int> table;
 };
 
 #endif // !VIRTUAL_MEMORY_HPP

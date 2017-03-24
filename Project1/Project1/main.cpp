@@ -1,44 +1,45 @@
+#include <exception>
 #include <iostream>
-#include "LStack.hpp"
-#include "LQueue.hpp"
+#include "Virtual_memory.hpp"
 
 
 int main() {
 
-  char c;
-  LQueue<char> queue;
+  Virtual_memory vm;
 
-  std::cin >> c;
-  while(c != '!') {
-    queue.enqueue(c);
-    std::cin >> c;
+  int add1 = vm.allocate(20);
+  int add2 = vm.allocate(10);
+  int add3 = vm.allocate(5);
+  int add4 = vm.allocate(8);
+  int add5 = vm.allocate(15);
+
+  try {
+    vm.free(add2);
+  } catch(const std::exception& e) {
+    std::cerr << e.what();
   }
 
-  LStack<char> stack;
-  const size_t size = queue.size();
-
-  for(int i = 0; i < size / 2; ++i) {
-    stack.push(queue.front());
-    queue.dequeue();
+  try {
+    vm[add1] = 4;
+    std::cout << static_cast<int>(vm[add1]) << '\n';
+  } catch(const std::exception& e) {
+    std::cerr << e.what();
   }
 
-  if(size & 1) {
-    queue.dequeue();
+  try {
+    vm.free(add3);
+  } catch(const std::exception& e) {
+    std::cerr << e.what();
   }
 
-  bool flag = true;
-  while(!stack.empty()) {
-    if(stack.top() != queue.front()) {
-      flag = false;
-      break;
-    }
-    stack.pop();
-    queue.dequeue();
+  try {
+    vm[add3] = 5;
+  } catch(const std::exception& e) {
+    std::cerr << e.what();
   }
 
-  std::cout << "is palindrome: " << std::boolalpha << flag << std::endl;
+  std::cout << "other available addresses: " << add4 << ", " << add5 << std::endl;
 
-  std::cin.get();
   std::cin.get();
   return 0;
 }

@@ -10,8 +10,7 @@ int Virtual_memory::allocate(int size) {
     throw std::exception("no more memory available\n");
   }
 
-  table[v_next_addr].first = p_next_addr;
-  table[v_next_addr].second = size;
+  table[v_next_addr] = p_next_addr;
 
   int old_addr = v_next_addr;
   p_next_addr += size;
@@ -26,19 +25,26 @@ void Virtual_memory::free(int v_addr) {
 
   // if the segment is not the last one, shift the segments, update the table
   // else just decrement the pointer
-  if(table[v_addr].first + table[v_addr].second != p_next_addr) {
-    int empty_mem = table[v_addr].first;
-    for(int i = table[v_addr].first + table[v_addr].second; i < p_next_addr; ++i) {
+  if(p_next_addr - table[v_addr] > 0) {
+    int empty_mem = table[v_addr];
+    std::map<int, int>::const_iterator current = table.find(v_addr);
+    std::map<int, int>::const_iterator old = current;
+    ++current; // to start copying bytes from the next segment
+
+    // calculate memory size to be deleted
+    int del_size = (*current).second - (*old).second;
+
+    for(int i = (*current).second; i < p_next_addr; ++i) {
       p_mem[empty_mem++] = p_mem[i];
     }
 
-    for(std::map<int, std::pair<int, int> >::iterator it = table.find(v_addr);
-        it != table.end(); ++it) {
-      it->second.first -= table[v_addr].second;
+    // starting from the next segment, decrement physical addresses in table
+    for(std::map<int, int>::iterator it = ++table.find(v_addr); it != table.end(); ++it) {
+      (*it).second -= del_size;
     }
   }
 
-  p_next_addr -= table[v_addr].second;
+  p_next_addr -= table[v_addr];
   table.erase(v_addr);
 }
 
@@ -47,5 +53,5 @@ char& Virtual_memory::operator[](int v_addr) {
     throw std::exception("invalid memory access\n");
   }
 
-  return p_mem[table[v_addr].first];
+  return p_mem[table[v_addr]];
 }
