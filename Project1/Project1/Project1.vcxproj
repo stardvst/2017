@@ -114,9 +114,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="graph.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="graph.hpp" />
     <ClInclude Include="LQueue.hpp" />
     <ClInclude Include="LStack.hpp" />
     <ClInclude Include="Queue.hpp" />
