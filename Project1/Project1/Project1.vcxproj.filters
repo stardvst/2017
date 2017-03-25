@@ -26,16 +26,16 @@
     <ClInclude Include="graph.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LQueue.hpp">
+    <ClInclude Include="AList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LStack.hpp">
+    <ClInclude Include="DLList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Queue.hpp">
+    <ClInclude Include="SLList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Stack.hpp">
+    <ClInclude Include="Node_freelist.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

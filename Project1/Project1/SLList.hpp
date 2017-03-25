@@ -77,29 +77,21 @@ template <typename T>
 bool SLList<T>::erase(const T& x) {
   assert(size != 0);
 
-  current = head;
-  Node* tmp = head;
-  Node* prev = head;
-  while(current && current->next) {
-    if(x == current->next->data) {
-      tmp = current->next;
-      current->next = tmp->next;
-      prev = current;
-      delete tmp;
+  move_to_start();
+
+  for(Node* prev = head; current; prev = current, current = current->next) {
+    if(x == current->data) {
+      prev->next = current->next;
+      if(current == tail) {
+        tail = prev;
+      }
+      delete current;
       --size;
+      move_to_start();
       return true;
-    } else {
-      current = current->next;
     }
   }
 
-  if(x == current->data) {
-    prev->next = 0;
-    delete tail;
-    tail = prev;
-    --size;
-    return true;
-  }
   return false;
 }
 
@@ -151,9 +143,10 @@ bool SLList<T>::next() {
 
 template <typename T>
 int SLList<T>::curr_pos() const {
-  Node* tmp = current;
+  Node* tmp = head;
   int i = 0;
-  while(tmp != current && ++i) {
+  while(tmp != current) {
+    ++i;
     tmp = tmp->next;
   }
   return i;

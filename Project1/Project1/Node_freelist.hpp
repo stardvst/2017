@@ -10,17 +10,19 @@ public:
   Node* prev;
   Node* next;
 
-  Node(T d, Node* p, Node* n) : data(d), prev(p), next(n) {
-    if(prev) prev->next = this;
-    if(next) next->prev = this;
-  }
-  Node(Node* p = NULL, Node* n = NULL) : prev(p), next(n) {
-    if(prev) prev->next = this;
-    if(next) next->prev = this;
+  Node(T d = T(), Node* p = 0, Node* n = 0) : data(d), prev(p), next(n) {
+    if(prev) {
+      prev->next = this;
+    }
+    if(next) {
+      next->prev = this;
+    }
   }
 
   void* operator new(size_t) {
-    if(freelist == NULL) return ::new Node;
+    if(freelist == 0) {
+      return ::new Node;
+    }
     Node* tmp = freelist;
     freelist = freelist->next;
     return tmp;
@@ -35,7 +37,7 @@ private:
 
 
 template <typename T>
-Node<T>* Node<T>::freelist = NULL;
+Node<T>* Node<T>::freelist = 0;
 
 
 #endif // !NODE_HPP

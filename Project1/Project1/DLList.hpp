@@ -74,33 +74,27 @@ template <typename T>
 bool DLList<T>::erase(const T& x) {
   assert(size != 0 && "list is empty");
 
-  current = head;
-  for(; current != tail && current->next; current = current->next) {
-    if(x == current->next->data) {
-      Node<T>* tmp = current->next;
-      current->next = tmp->next;
-      if(tmp->next) {
-        tmp->next->prev = tmp->prev;
+  move_to_start();
+
+  for(Node<T>* prev = head; current; prev = current, current = current->next) {
+    if(x == current->data) {
+      prev->next = current->next;
+      if(tail == current) {
+        tail = prev;
+      } else {
+        current->next->prev = prev; // else there is an element
       }
-      if(tmp == tail) {
-        tail = tmp->prev;
-      }
-      delete tmp;
+      delete current;
       --size;
+      move_to_start();
       return true;
     }
   }
 
-  if(x == current->data) {
-    delete tail;
-    tail = current;
-    tail->next = 0;
-    return true;
-  }
   return false;
 }
 
-template <typename T>
+template <typename T> // ???
 bool DLList<T>::erase_curr() {
   assert(size != 0 && "list is empty");
   Node<T>* tmp = current->next;
@@ -147,9 +141,10 @@ bool DLList<T>::next() {
 
 template <typename T>
 int DLList<T>::curr_pos() const {
-  Node<T>* tmp = current;
+  Node<T>* tmp = head;
   int i = 0;
-  while(tmp != current && ++i) {
+  while(tmp != current) {
+    ++i;
     tmp = tmp->next;
   }
   return i;
