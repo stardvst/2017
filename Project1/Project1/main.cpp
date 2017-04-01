@@ -1,22 +1,29 @@
 #include <iostream>
 
 
-struct A {
-  A(int xx) : x(0) {}
-  int x;
+struct Exc1 {
+  void what() { std::cout << "Exc1" << std::endl; }
 };
 
-struct B : virtual public A { B() : A(5) {} };
-struct C : virtual public A { C() : A(0) {} };
-
-struct D : public B, public C { D() : A(1) {} };
+struct Exc2 : public Exc1 {
+  void what() { std::cout << "Exc2" << std::endl; }
+};
 
 
 int main() {
 
-  A arr[5];
-  for(int i = 0; i < 3; ++i) {
-    std::cout << arr[i].x;
+  try {
+    throw Exc2();
+  }
+  /*catch(Exc1& e) {
+    std::cout << "1st catch: "; // Exc2& is caught by base class
+    e.what();
+  }*/
+  catch(Exc2& e) {
+    std::cout << "2nd catch: ";
+    e.what();
+  } catch(...) {
+    std::cout << "unknown exception\n";
   }
 
   std::cin.get();
