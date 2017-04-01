@@ -2,10 +2,7 @@
 
 
 struct A {
-  A(int xx) : x(xx) { 
-    std::cout << x << std::endl; 
-  }
-  virtual ~A() {}
+  A(int xx) : x(0) {}
   int x;
 };
 
@@ -17,8 +14,10 @@ struct D : public B, public C { D() : A(1) {} };
 
 int main() {
 
-  A* p = new D();
-  delete p;
+  A arr[5];
+  for(int i = 0; i < 3; ++i) {
+    std::cout << arr[i].x;
+  }
 
   std::cin.get();
   return 0;
