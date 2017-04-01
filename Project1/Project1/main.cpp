@@ -1,21 +1,19 @@
 #include <iostream>
-#include <algorithm>
-#include <functional>
 
-
-struct A {
-  virtual void f() { std::cout << "A "; }
-};
-
-struct B : public A {
-  virtual void f() { std::cout << "B "; }
-};
 
 int main() {
 
-  A* a[] = { new A(), new B() };
+  enum Colors {
+    red,
+    blue,
+    white = 5,
+    yellow,
+    green,
+    pink
+  };
 
-  std::for_each(a, a + 2, std::mem_fun(&A::f));
+  Colors color = green;
+  printf("%d", color);
 
   std::cin.get();
   return 0;
