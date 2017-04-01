@@ -1,17 +1,24 @@
 #include <iostream>
-#include <memory>
 
-// void f(std::auto_ptr<int>& a) - ok
-void f(std::auto_ptr<int> a) {
-  *a = 3;
-}
+
+struct A {
+  A(int xx) : x(xx) { 
+    std::cout << x << std::endl; 
+  }
+  virtual ~A() {}
+  int x;
+};
+
+struct B : virtual public A { B() : A(5) {} };
+struct C : virtual public A { C() : A(0) {} };
+
+struct D : public B, public C { D() : A(1) {} };
 
 
 int main() {
 
-  std::auto_ptr<int> p(new int(0));
-  f(p);
-  std::cout << *p << std::endl;
+  A* p = new D();
+  delete p;
 
   std::cin.get();
   return 0;
