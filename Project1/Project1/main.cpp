@@ -1,17 +1,18 @@
 #include <iostream>
 
 
-class G {};
-class M : virtual public G {};
-class P : virtual public G {};
-class m : public M, public P, virtual public G {};
-
+struct A {
+  A() {}
+  ~A() { std::cout << "dtor" << std::endl; }
+};
 
 int main() {
 
-  m* me = new m();
-  me;
+  A a;
+  a.~A(); // ~A()
 
   std::cin.get();
   return 0;
+
+  // ~A()
 }
