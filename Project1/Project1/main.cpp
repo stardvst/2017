@@ -1,30 +1,30 @@
 #include <iostream>
 
 
-class A {
-public:
-  A(int ii = 0) : i(ii) { 
-    std::cout << i; 
-    ++i; 
-  }
-protected:
-  int i;
+struct A {
+  virtual void f(int n) { std::cout << n << 1; }
+  void f(int n) const   { std::cout << n; }
+
+  virtual ~A() {}
 };
 
-class B : public A {
-public:
-  B() : a(new A[2]), x(++i) {
-    std::cout << i;
-  }
-private:
-  A x;
-  A* a;
+struct B : A {
+  void f(int n)       { std::cout << (n << 1); }
+  void f(int n) const { std::cout << n + 1; }
 };
 
 
 int main() {
 
+  const A a;
   B b;
+  A& c = b;
+  const A* d = &b;
+
+  a.f(2);
+  b.f(2);
+  c.f(1);
+  d->f(1);
 
   std::cin.get();
   return 0;
