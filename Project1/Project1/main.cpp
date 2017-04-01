@@ -4,25 +4,37 @@
 
 class A {
 public:
-  A(int nn = 2) : n(nn) {}
-  ~A() { std::cout << n; }
+  A() : i(0) {}
 protected:
-  int n;
+  int i;
 };
 
-class B : public A {
+class B {
 public:
-  B(int nn) : x(n + 1), a(nn) {}
-  ~B() { std::cout << n; --n; }
+  B() : d(0.0) {}
+protected:
+  double d;
+};
+
+class C : public A, public B {
+public:
+  C() : c('a') {}
 private:
-  A x;
-  A a;
+  char c;
 };
 
 
 int main() {
 
-  { B b(5); }
+  C cobj;
+  A* ap = &cobj;
+  B* bp = &cobj;
+
+  const int a = (reinterpret_cast<char*>(ap) == reinterpret_cast<char*>(&cobj) ? 1 : 2);
+  const int b = (bp == &cobj) ? 3 : 4;
+  const int c = (reinterpret_cast<char*>(ap) == reinterpret_cast<char*>(bp)) ? 5 : 6;
+
+  std::cout << a << b << c << std::endl;
 
   std::cin.get();
   return 0;
