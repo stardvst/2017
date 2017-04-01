@@ -1,12 +1,23 @@
 #include <iostream>
-#include <typeinfo>
+
+
+struct A {
+  virtual void f(int x = 0) {
+    std::cout << "A: " << x << std::endl;
+  }
+};
+
+struct B : public A {
+  virtual void f(int x = 1) {
+    std::cout << "B: " << x << std::endl;
+  }
+};
 
 
 int main() {
 
-  int c = 1;
-  c = ++c + ++c;
-  std::cout << c;
+  A* p = new B();
+  p->f();
 
   std::cin.get();
   return 0;
