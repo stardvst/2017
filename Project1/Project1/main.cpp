@@ -1,23 +1,17 @@
 #include <iostream>
+#include <memory>
 
-
-struct A {
-  virtual void f(int x = 0) {
-    std::cout << "A: " << x << std::endl;
-  }
-};
-
-struct B : public A {
-  virtual void f(int x = 1) {
-    std::cout << "B: " << x << std::endl;
-  }
-};
+// void f(std::auto_ptr<int>& a) - ok
+void f(std::auto_ptr<int> a) {
+  *a = 3;
+}
 
 
 int main() {
 
-  A* p = new B();
-  p->f();
+  std::auto_ptr<int> p(new int(0));
+  f(p);
+  std::cout << *p << std::endl;
 
   std::cin.get();
   return 0;
