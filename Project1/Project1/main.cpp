@@ -1,17 +1,23 @@
 #include <iostream>
 
 
-struct A {
-  A() {}
-  ~A() { std::cout << "dtor" << std::endl; }
-};
+template<typename T>
+void kill(T*& t) {
+  delete t;
+  t = 0;
+}
+
+struct A {};
+
 
 int main() {
 
-  A a;
-  a.~A(); // ~A()
+  A* ptr = new A();
+  kill(ptr);
+  kill(ptr);
 
-  std::cin.get();
+
+   std::cin.get();
   return 0;
 
   // ~A()
