@@ -1,40 +1,28 @@
 #include <iostream>
-#include <vector>
-
-
-class A {
-public:
-  A() : i(0) {}
-protected:
-  int i;
-};
-
-class B {
-public:
-  B() : d(0.0) {}
-protected:
-  double d;
-};
-
-class C : public A, public B {
-public:
-  C() : c('a') {}
-private:
-  char c;
-};
+#include <algorithm>
+#include <functional>
+#include <iterator>
+#include <list>
 
 
 int main() {
 
-  C cobj;
-  A* ap = &cobj;
-  B* bp = &cobj;
+  typedef std::list<int> L;
+  L l(5);
 
-  const int a = (reinterpret_cast<char*>(ap) == reinterpret_cast<char*>(&cobj) ? 1 : 2);
-  const int b = (bp == &cobj) ? 3 : 4;
-  const int c = (reinterpret_cast<char*>(ap) == reinterpret_cast<char*>(bp)) ? 5 : 6;
+  typedef L::const_iterator CI;
+  CI cb = l.begin(), ce = l.end();
 
-  std::cout << a << b << c << std::endl;
+  typedef L::iterator I;
+  I b = l.begin();
+
+  std::transform(cb, --ce, // input range
+    ++b, // output range
+    std::bind2nd(std::plus<CI::value_type>(), 1) // what to do
+  );
+
+  std::copy(l.begin(), l.end(),
+            std::ostream_iterator<CI::value_type>(std::cout));
 
   std::cin.get();
   return 0;
