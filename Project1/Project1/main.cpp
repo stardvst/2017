@@ -1,24 +1,30 @@
 #include <iostream>
 
 
-template<typename T, T t = T()>
 class A {
-private:
-  template<bool b>
-  struct B {
-    static const int n = b ? 1 : 0;
-  };
-
 public:
-  static const int value = B<(t > T())>::n - B<(t < T())>::n;
+  A(int ii = 0) : i(ii) { 
+    std::cout << i; 
+    ++i; 
+  }
+protected:
+  int i;
+};
+
+class B : public A {
+public:
+  B() : a(new A[2]), x(++i) {
+    std::cout << i;
+  }
+private:
+  A x;
+  A* a;
 };
 
 
 int main() {
 
-  std::cout << A<int, -9>::value;
-  std::cout << A<bool, true>::value;
-  std::cout << A<char>::value;
+  B b;
 
   std::cin.get();
   return 0;
