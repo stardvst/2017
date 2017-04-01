@@ -4,11 +4,9 @@
 
 int main() {
 
-  int(*p)[10] = { 0 };
-
-  std::cout << typeid(p).name() << std::endl;
-  std::cout << (size_t)(p + 1) << std::endl;
-  std::cout << (size_t)p << std::endl;
+  int c = 1;
+  c = ++c + ++c;
+  std::cout << c;
 
   std::cin.get();
   return 0;
