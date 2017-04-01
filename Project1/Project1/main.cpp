@@ -1,15 +1,21 @@
 #include <iostream>
+#include <algorithm>
+#include <functional>
 
 
-void f(int) { std::cout << "int" << std::endl; }
-void f(unsigned short) { std::cout << "unsigned short" << std::endl; }
-void f(unsigned int) { std::cout << "unsigned int" << std::endl; }
+struct A {
+  virtual void f() { std::cout << "A "; }
+};
 
+struct B : public A {
+  virtual void f() { std::cout << "B "; }
+};
 
 int main() {
 
-  short c = 5;
-  f(c);
+  A* a[] = { new A(), new B() };
+
+  std::for_each(a, a + 2, std::mem_fun(&A::f));
 
   std::cin.get();
   return 0;
