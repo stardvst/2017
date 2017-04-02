@@ -1,43 +1,24 @@
 #include <iostream>
+#include <set>
 
 
-class A {
-public:
-  A(int nn = 2) : n(nn) {}
-
-  int get_n() const { return n; }
-  void set_n(int nn) { n = nn; }
-private:
-  int n;
+struct C {
+  bool operator()(const int& a, const int& b) const {
+    return a % 10 < b % 10;
+  }
 };
-
-class B {
-public:
-  B(char cc = 'a') : c(cc) {}
-
-  char get_c() const { return c; }
-  void set_c(char cc) { c = cc; }
-private:
-  char c;
-};
-
-class C : virtual public A, public B {};
-class D : virtual public A, public B {};
-class E : public C, public D {};
 
 
 int main() {
 
-  E e;
-  C& c = e;
-  D& d = e;
+  const int a[] = { 4,2,7,11,12,14,17,2 };
+  const int count = sizeof(a) / sizeof(a[0]);
 
-  std::cout << c.get_c() << d.get_n();
-
-  c.set_n(3);
-  d.set_c('b');
-
-  std::cout << c.get_c() << d.get_n();
+  std::set<int> x(a, a + count);
+  std::cout << x.size();
+  
+  std::set<int, C> y(x.begin(), x.end());
+  std::cout << y.size();
 
   std::cin.get();
   return 0;
