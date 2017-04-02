@@ -1,45 +1,25 @@
 #include <algorithm>
 #include <iostream>
-#include <vector>
 #include <list>
 
 
-class Int {
-public:
-  Int(int ii = 0) : i(ii) {}
-
-  Int& operator=(const Int& a) {
-    this->i = a.i;
-    ++assignments;
-    return *this;
+struct P {
+  bool operator()(const int& n) const {
+    return n % 3 == 0;
   }
-
-  bool operator<(const Int& a) const { return this->i == a.i; }
-
-  static int get_assignments() { return assignments; }
-private:
-  int i;
-  static int assignments;
 };
-
-int Int::assignments = 0;
 
 
 int main() {
 
-  std::list<Int> l;
-  l.push_back(Int(3));
-  l.push_back(Int(1));
-  l.sort();
+  const int a[] = { 5,2,6,1,13,9,19 };
+  const int count = sizeof(a) / sizeof(a[0]);
 
-  std::cout << Int::get_assignments();
+  std::list<int> l(a, a + count);
 
-  std::vector<Int> v;
-  v.push_back(Int(2));
-  v.push_back(Int(1));
-  std::sort(v.begin(), v.end());
-
-  std::cout << Int::get_assignments();
+  std::cout << l.size();
+  std::remove_if(l.begin(), l.end(), P());
+  std::cout << l.size();
 
   std::cin.get();
   return 0;
