@@ -1,30 +1,45 @@
+#include <algorithm>
 #include <iostream>
+#include <vector>
+#include <list>
 
 
-struct A {
-  virtual void f(int n) { std::cout << n << 1; }
-  void f(int n) const   { std::cout << n; }
+class Int {
+public:
+  Int(int ii = 0) : i(ii) {}
 
-  virtual ~A() {}
+  Int& operator=(const Int& a) {
+    this->i = a.i;
+    ++assignments;
+    return *this;
+  }
+
+  bool operator<(const Int& a) const { return this->i == a.i; }
+
+  static int get_assignments() { return assignments; }
+private:
+  int i;
+  static int assignments;
 };
 
-struct B : A {
-  void f(int n)       { std::cout << (n << 1); }
-  void f(int n) const { std::cout << n + 1; }
-};
+int Int::assignments = 0;
 
 
 int main() {
 
-  const A a;
-  B b;
-  A& c = b;
-  const A* d = &b;
+  std::list<Int> l;
+  l.push_back(Int(3));
+  l.push_back(Int(1));
+  l.sort();
 
-  a.f(2);
-  b.f(2);
-  c.f(1);
-  d->f(1);
+  std::cout << Int::get_assignments();
+
+  std::vector<Int> v;
+  v.push_back(Int(2));
+  v.push_back(Int(1));
+  std::sort(v.begin(), v.end());
+
+  std::cout << Int::get_assignments();
 
   std::cin.get();
   return 0;
