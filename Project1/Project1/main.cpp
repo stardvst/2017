@@ -3,37 +3,39 @@
 
 class A {
 public:
-  explicit A(int nn = 0) : n(nn) {}
+  A(int nn = 0) : n(nn) {}
   
-  A& operator=(const A& a) {
-    n = a.n;
-    ++assignment_calls;
-    return *this;
-  }
+  A(const A& a) : n(a.n) { ++copy_ctor_calls; }
+  ~A() { ++dtor_calls; }
 
-  static int assignment_calls;
+  static int copy_ctor_calls;
+  static int dtor_calls;
 private:
   int n;
 };
 
-int A::assignment_calls = 0;
+int A::copy_ctor_calls = 0;
+int A::dtor_calls = 0;
 
-A f(const A& a) { return a; }
-A g(const A a) { return a; }
 
 int main() {
 
-  A a(3); // copy ctor
-  A b = a; // copy ctor
-  std::cout << A::assignment_calls;
+  A* p = 0;
 
-  b = g(a); // operator=
-  g(b); // copy ctor
-  std::cout << A::assignment_calls;
+  {
+    const A a = 2;
+    p = new A[3];
+    p[0] = a;
+  }
 
-  const A& c = f(b); // copy ctor
-  std::cout << A::assignment_calls;
+  std::cout << A::copy_ctor_calls << A::dtor_calls;
 
+  p[1] = A(1);
+  p[2] = 2;
+
+  delete[] p;
+
+  std::cout << A::copy_ctor_calls << A::dtor_calls;
 
   std::cin.get();
   return 0;
