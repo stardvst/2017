@@ -3,30 +3,29 @@
 
 
 class A {
+  friend int g(const A&);
 public:
-  A(int nn = 0) : n(nn) { std::cout << n; }
-  ~A() { std::cout << n; }
+  A(int nn = 0) : n(nn) {}
+  
+  int operator()(int i = 0) const { return n + i; }
+  operator int() const { return n; }
 private:
   int n;
 };
 
-int f(int n) {
-  if(1 == n) {
-    throw std::logic_error("0");
-  }
-  A l(n);
-  return f(n - 1) * n / (n - 1);
-}
+
+// these functions are USELESS!!! they're for distracting
+
+//int f(char c) { return c; } 
+//int g(const A& a) { return a.n; }
 
 
 int main() {
 
-  try {
-    int r = f(3);
-    A a(r);
-  } catch(const std::exception& e) {
-    std::cout << e.what();
-  }
+  A f(2), g(3);
+
+  std::cout << f(1);
+  std::cout << g(f);
 
   std::cin.get();
   return 0;
