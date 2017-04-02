@@ -1,25 +1,32 @@
-#include <algorithm>
 #include <iostream>
-#include <list>
+#include <stdexcept>
 
 
-struct P {
-  bool operator()(const int& n) const {
-    return n % 3 == 0;
-  }
+class A {
+public:
+  A(int nn = 0) : n(nn) { std::cout << n; }
+  ~A() { std::cout << n; }
+private:
+  int n;
 };
+
+int f(int n) {
+  if(1 == n) {
+    throw std::logic_error("0");
+  }
+  A l(n);
+  return f(n - 1) * n / (n - 1);
+}
 
 
 int main() {
 
-  const int a[] = { 5,2,6,1,13,9,19 };
-  const int count = sizeof(a) / sizeof(a[0]);
-
-  std::list<int> l(a, a + count);
-
-  std::cout << l.size();
-  std::remove_if(l.begin(), l.end(), P());
-  std::cout << l.size();
+  try {
+    int r = f(3);
+    A a(r);
+  } catch(const std::exception& e) {
+    std::cout << e.what();
+  }
 
   std::cin.get();
   return 0;
