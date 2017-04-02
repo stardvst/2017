@@ -1,24 +1,67 @@
+#include <functional>
+#include <algorithm>
 #include <iostream>
-#include <set>
+#include <cstddef>
+#include <cassert>
+#include <vector>
 
 
-struct C {
-  bool operator()(const int& a, const int& b) const {
-    return a % 10 < b % 10;
+class A {
+public:
+  A() : size(sizeof(A)) {}
+  virtual ~A() {}
+
+  virtual void f() const { std::cout << 1; }
+
+  static bool compare(const A* a, const A* b) {
+    assert(a != 0);
+    assert(b != 0);
+    return a->size < b->size;
   }
+
+protected:
+  size_t size;
+};
+
+class B : public A {
+public:
+  B() : b(0) { size = sizeof(B); }
+  virtual void f() const { std::cout << 2; }
+private:
+  char* b;
+};
+
+class C : public A {
+public:
+  C() { size = sizeof(C); }
+  virtual void f() const { std::cout << 3; }
+private:
+  static int* c;
+};
+
+int* C::c = 0;
+
+struct D {
+  void operator()(A* a) const { delete a; }
 };
 
 
 int main() {
 
-  const int a[] = { 4,2,7,11,12,14,17,2 };
-  const int count = sizeof(a) / sizeof(a[0]);
+  std::cout << sizeof(A)  << " " << sizeof(B) << " " << sizeof(C) << "\n";
 
-  std::set<int> x(a, a + count);
-  std::cout << x.size();
-  
-  std::set<int, C> y(x.begin(), x.end());
-  std::cout << y.size();
+  typedef std::vector<A*> V;
+  V v;
+  v.push_back(new C);
+  v.push_back(new B);
+  v.push_back(new A);
+
+  std::stable_sort(v.begin(), v.end(), A::compare);
+
+  std::for_each(v.begin(), v.end(), std::mem_fun(&A::f));
+
+  D d;
+  std::for_each(v.begin(), v.end(), d);
 
   std::cin.get();
   return 0;
