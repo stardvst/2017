@@ -1,31 +1,39 @@
 #include <iostream>
-#include <stdexcept>
 
 
 class A {
-  friend int g(const A&);
 public:
-  A(int nn = 0) : n(nn) {}
+  explicit A(int nn = 0) : n(nn) {}
   
-  int operator()(int i = 0) const { return n + i; }
-  operator int() const { return n; }
+  A& operator=(const A& a) {
+    n = a.n;
+    ++assignment_calls;
+    return *this;
+  }
+
+  static int assignment_calls;
 private:
   int n;
 };
 
+int A::assignment_calls = 0;
 
-// these functions are USELESS!!! they're for distracting
-
-//int f(char c) { return c; } 
-//int g(const A& a) { return a.n; }
-
+A f(const A& a) { return a; }
+A g(const A a) { return a; }
 
 int main() {
 
-  A f(2), g(3);
+  A a(3); // copy ctor
+  A b = a; // copy ctor
+  std::cout << A::assignment_calls;
 
-  std::cout << f(1);
-  std::cout << g(f);
+  b = g(a); // operator=
+  g(b); // copy ctor
+  std::cout << A::assignment_calls;
+
+  const A& c = f(b); // copy ctor
+  std::cout << A::assignment_calls;
+
 
   std::cin.get();
   return 0;
