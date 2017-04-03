@@ -1,15 +1,16 @@
 #include <iostream>
 
 
-class A {
-  int i;
-  A() : i(0) { std::cout << "Hello world"; }
-};
+int& foo() {
+  static int a = 3;
+  return a;
+}
 
 
 int main() {
 
-  A a;
+  ++++foo();
+  std::cout << foo();
 
   std::cin.get();
   return 0;
