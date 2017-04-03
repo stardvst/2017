@@ -1,30 +1,36 @@
 #include <iostream>
 
 
-class A {
+class Data {
 public:
-  A(int nn = 0) : n(nn) { std::cout << n; }
-protected:
+  Data() : n(0) { std::cout << "Data"; }
+  ~Data() { std::cout << "~Data"; }
+private:
   int n;
 };
 
-class B : public A {
+class Base {
 public:
-  B(int param) : j(param), a(--j), b() { std::cout << j; }
+  Base() { std::cout << "Base"; }
+  ~Base() { std::cout << "~Base"; }
 private:
-  int j;
-  A a;
-  A b;
-  static A c;
+  Data b;
 };
 
+class Der : public Base {
+public:
+  Der() { std::cout << "Der"; }
+  ~Der() { std::cout << "~Der"; }
+private:
+  Data d;
+};
 
 int main() {
 
-  B b(2);
+  Base* b = new Der(); // DataBaseDataDer~Base~Data
+  // Der* b = new Der(); // DataBaseDataDer~Der~Data~Base~Data
+  delete b;
 
   std::cin.get();
   return 0;
 }
-
-A B::c = 3;
