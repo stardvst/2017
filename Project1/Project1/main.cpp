@@ -1,35 +1,32 @@
 #include <iostream>
 
 
-class Data {
+class A {
 public:
-  Data() : n(0) { std::cout << "Data"; }
-  ~Data() { std::cout << "~Data"; }
-private:
-  int n;
+  static unsigned count;
+
+  A() { ++count; }
+  A(const A&) { ++count; }
+  ~A() { --count; }
 };
 
-class Base {
-public:
-  Base() { std::cout << "Base"; }
-  ~Base() { std::cout << "~Base"; }
-private:
-  Data b;
-};
+unsigned A::count = 0;
 
-class Der : public Base {
-public:
-  Der() { std::cout << "Der"; }
-  ~Der() { std::cout << "~Der"; }
-private:
-  Data d;
-};
 
 int main() {
 
-  Base* b = new Der(); // DataBaseDataDer~Base~Data
-  // Der* b = new Der(); // DataBaseDataDer~Der~Data~Base~Data
-  delete b;
+  const int N = 100;
+  
+  A a[N]; // ctor
+  char* apt = new char[N * sizeof(A)];
+
+  for(int i = 0; i < N; ++i) {
+    new (&apt[i])A(a[i]); // copy ctor
+  }
+
+  delete[] apt;
+
+  std::cout << A::count;
 
   std::cin.get();
   return 0;
