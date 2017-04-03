@@ -1,32 +1,24 @@
 #include <iostream>
 
 
-class A {
-public:
-  static unsigned count;
-
-  A() { ++count; }
-  A(const A&) { ++count; }
-  ~A() { --count; }
+struct A {
+  A() { std::cout << "A()"; }
+  A(int) { std::cout << "A(int)"; }
+  A& operator=(int) { std::cout << "="; return *this; }
 };
 
-unsigned A::count = 0;
+class B {
+public: 
+  B() : m2(8) { m1 = 5; }
+private:
+  A m1;
+  A m2;
+};
 
 
 int main() {
 
-  const int N = 100;
-  
-  A a[N]; // ctor
-  char* apt = new char[N * sizeof(A)];
-
-  for(int i = 0; i < N; ++i) {
-    new (&apt[i])A(a[i]); // copy ctor
-  }
-
-  delete[] apt;
-
-  std::cout << A::count;
+  B b;
 
   std::cin.get();
   return 0;
