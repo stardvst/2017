@@ -64,7 +64,24 @@ void Binary_tree<T>::preorder() const {
 
 template<typename T>
 void Binary_tree<T>::levelorder() const {
-  _levelorder(root);
+  if(root != 0) {
+    std::queue<Node<T>*> queue;
+    queue.push(root);
+
+    while(!queue.empty()) {
+      Node<T>* node = queue.front();
+      queue.pop();
+
+      std::cout << node->value << ' ';
+
+      if(node->left) {
+        queue.push(node->left);
+      }
+      if(node->right) {
+        queue.push(node->right);
+      }
+    }
+  }
 }
 
 template<typename T>
@@ -91,28 +108,6 @@ void Binary_tree<T>::_preorder(Node<T>* ptr) const {
     std::cout << ptr->value << ' ';
     _preorder(ptr->left);
     _preorder(ptr->right);
-  }
-}
-
-template<typename T>
-void Binary_tree<T>::_levelorder(Node<T>* ptr) const {
-  if(ptr != 0) {
-    std::queue<Node<T>*> queue;
-    queue.push(ptr);
-
-    while(!queue.empty()) {
-      Node<T>* node = queue.front();
-      queue.pop();
-
-      std::cout << node->value << ' ';
-
-      if(node->left) {
-        queue.push(node->left);
-      }
-      if(node->right) {
-        queue.push(node->right);
-      }
-    }
   }
 }
 
