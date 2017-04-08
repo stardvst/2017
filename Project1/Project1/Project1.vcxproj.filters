@@ -18,24 +18,27 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graph.cpp">
+    <ClCompile Include="Virtual_memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="graph.hpp">
+    <ClInclude Include="Virtual_memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AList.hpp">
+    <ClInclude Include="Page.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DLList.hpp">
+    <ClInclude Include="PD_entry.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SLList.hpp">
+    <ClInclude Include="Ctrl_reg.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Node_freelist.hpp">
+    <ClInclude Include="PT_entry.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="V_addr.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

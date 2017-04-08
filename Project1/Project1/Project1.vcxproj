@@ -114,15 +114,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="graph.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Virtual_memory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AList.hpp" />
-    <ClInclude Include="DLList.hpp" />
-    <ClInclude Include="graph.hpp" />
-    <ClInclude Include="Node_freelist.hpp" />
-    <ClInclude Include="SLList.hpp" />
+    <ClInclude Include="Ctrl_reg.hpp" />
+    <ClInclude Include="Page.hpp" />
+    <ClInclude Include="PD_entry.hpp" />
+    <ClInclude Include="PT_entry.hpp" />
+    <ClInclude Include="Virtual_memory.hpp" />
+    <ClInclude Include="V_addr.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
