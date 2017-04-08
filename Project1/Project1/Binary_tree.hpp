@@ -2,6 +2,7 @@
 #define BINARY_TREE_HPP
 
 #include <iostream>
+#include <stack>
 #include <queue>
 #include "Node.hpp"
 
@@ -10,6 +11,7 @@ template<typename T>
 class Binary_tree {
 public:
   Binary_tree(Node<T>* r = 0) : root(r) {}
+
   void inorder() const;
   void inorder_iter() const;
 
@@ -34,7 +36,20 @@ void Binary_tree<T>::inorder() const {
 
 template<typename T>
 void Binary_tree<T>::inorder_iter() const {
+  std::stack<Node<T>*> stack;
+  Node<T>* node = root;
 
+  while(node || !stack.empty()) {
+    if(node) {
+      stack.push(node);
+      node = node->left;
+    } else {
+      node = stack.top();
+      stack.pop();
+      std::cout << node->value << ' ';
+      node = node->right;
+    }
+  }
 }
 
 template<typename T>
@@ -56,7 +71,7 @@ template<typename T>
 void Binary_tree<T>::_inorder(Node<T>* ptr) const {
   if(ptr != 0) {
     _inorder(ptr->left);
-    std::cout << ptr->value;
+    std::cout << ptr->value << ' ';
     _inorder(ptr->right);
   }
 }
@@ -66,14 +81,14 @@ void Binary_tree<T>::_postorder(Node<T>* ptr) const {
   if(ptr != 0) {
     _postorder(ptr->left);
     _postorder(ptr->right);
-    std::cout << ptr->value;
+    std::cout << ptr->value << ' ';
   }
 }
 
 template<typename T>
 void Binary_tree<T>::_preorder(Node<T>* ptr) const {
   if(ptr != 0) {
-    std::cout << ptr->value;
+    std::cout << ptr->value << ' ';
     _preorder(ptr->left);
     _preorder(ptr->right);
   }
@@ -89,10 +104,11 @@ void Binary_tree<T>::_levelorder(Node<T>* ptr) const {
       Node<T>* node = queue.front();
       queue.pop();
 
-      std::cout << node->value;
+      std::cout << node->value << ' ';
+
       if(node->left) {
         queue.push(node->left);
-      } 
+      }
       if(node->right) {
         queue.push(node->right);
       }
