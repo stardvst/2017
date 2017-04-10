@@ -1,23 +1,44 @@
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
 
-void COUNTING_SORT(const std::vector<int> A, std::vector<int>& B, int k) {
-  std::vector<int> C(k + 1); // C contains 0s
+int get_max(const std::vector<int>& A) {
+  int max = A[0];
+  for(size_t i = 1; i < A.size(); ++i) {
+    if(A[i] > max) {
+      max = A[i];
+    }
+  }
+  return max;
+}
+
+void COUNTING_SORT(std::vector<int>& A, int exp) {
+  
+  std::vector<int> B(A.size()); 
+  std::vector<int> C(10);
 
   for(size_t i = 0; i < A.size(); ++i) {
-    ++C[A[i]];
+    ++C[(A[i] / exp) % 10];
   }
 
-  for(int i = 1; i <= k; ++i) {
+  for(int i = 1; i < 10; ++i) {
     C[i] += C[i - 1];
   }
 
   for(int i = static_cast<int>(A.size()) - 1; i >= 0; --i) {
-    B[C[A[i]] - 1] = A[i];
-    --C[A[i]];
+    B[C[(A[i] / exp) % 10] - 1] = A[i];
+    --C[(A[i] / exp) % 10];
   }
 
+  std::swap_ranges(A.begin(), A.end(), B.begin());
+}
+
+void RADIX_SORT(std::vector<int>& A) {
+  int max = get_max(A);
+  for(int exp = 1; max / exp > 0; exp *= 10) {
+    COUNTING_SORT(A, exp);
+  }
 }
 
 
@@ -36,19 +57,10 @@ int main() {
     std::cin >> A[i];
   }
 
-  int k = 0;
-  while(k <= 0) {
-    std::cout << "\nrange: 0 - ";
-    std::cin >> k;
-  }
-
-  std::vector<int> B(number);
-
-  COUNTING_SORT(A, B, k);
-
+  RADIX_SORT(A);
 
   for(int i = 0; i < number; ++i) {
-    std::cout << B[i] << ' ';
+    std::cout << A[i] << ' ';
   }
 
   std::cin.get();
