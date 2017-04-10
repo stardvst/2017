@@ -1,42 +1,57 @@
-#include <exception>
 #include <iostream>
-#include "Virtual_memory.hpp"
-#include "V_addr.hpp"
+#include <vector>
+
+
+void COUNTING_SORT(const std::vector<int> A, std::vector<int>& B, int k) {
+  std::vector<int> C(k + 1); // C contains 0s
+
+  for(size_t i = 0; i < A.size(); ++i) {
+    ++C[A[i]];
+  }
+
+  for(int i = 1; i <= k; ++i) {
+    C[i] += C[i - 1];
+  }
+
+  for(int i = static_cast<int>(A.size()) - 1; i >= 0; --i) {
+    B[C[A[i]] - 1] = A[i];
+    --C[A[i]];
+  }
+
+}
 
 
 int main() {
 
-  Virtual_memory vm;
-
-  V_addr add1 = vm.allocate(20);
-  V_addr add2 = vm.allocate(12);
-  V_addr add3 = vm.allocate(4);
-
-  try {
-    vm.free(add2);
-  } catch(const std::exception& e) {
-    std::cerr << e.what();
+  int number = 0;
+  while(number <= 0) {
+    std::cout << "# of elements: ";
+    std::cin >> number;
   }
 
-  try {
-    vm[add1] = 4;
-    std::cout << static_cast<int>(static_cast<const Virtual_memory>(vm)[add1]) << '\n'; // call const operator[]
-  } catch(const std::exception& e) {
-    std::cerr << e.what();
+  std::vector<int> A(number);
+
+  for(int i = 0; i < number; ++i) {
+    std::cout << "A[" << i << "] = ";
+    std::cin >> A[i];
   }
 
-  try {
-    vm.free(add3);
-  } catch(const std::exception& e) {
-    std::cerr << e.what();
+  int k = 0;
+  while(k <= 0) {
+    std::cout << "\nrange: 0 - ";
+    std::cin >> k;
   }
 
-  try {
-    vm[add3] = 5;
-  } catch(const std::exception& e) {
-    std::cerr << e.what();
+  std::vector<int> B(number);
+
+  COUNTING_SORT(A, B, k);
+
+
+  for(int i = 0; i < number; ++i) {
+    std::cout << B[i] << ' ';
   }
 
+  std::cin.get();
   std::cin.get();
   return 0;
 }
