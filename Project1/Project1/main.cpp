@@ -1,46 +1,52 @@
-#include <algorithm>
 #include <iostream>
 #include <vector>
+#include <list>
 
 
-int get_max(const std::vector<int>& A) {
-  int max = A[0];
-  for(size_t i = 1; i < A.size(); ++i) {
-    if(A[i] > max) {
-      max = A[i];
+void INSERTION_SORT(std::list<double>& B) {
+  std::vector<double> A;
+  for(std::list<double>::const_iterator it = B.begin(); it != B.end(); ++it) {
+    A.push_back(*it);
+  }
+
+  for(int i = 1; i < A.size(); ++i) {
+    double key = A[i];
+    int j = i - 1;
+
+    while(j >= 0 && A[j] > key) {
+      A[j + 1] = A[j];
+      j = j - 1;
+    }
+
+    A[j + 1] = key;
+  }
+
+  B.clear();
+  for(int i = 0; i < A.size(); ++i) {
+    B.push_back(A[i]);
+  }
+}
+
+void BUCKET_SORT(std::vector<double>& A) {
+  std::vector<std::list<double> > B(A.size());
+  const size_t size = A.size();
+
+  for(size_t i = 0; i < size; ++i) {
+    int index = static_cast<int>(size * A[i]);
+    B[index].push_back(A[i]);
+  }
+
+  for(size_t i = 0; i < size; ++i) {
+    INSERTION_SORT(B[i]);
+  }
+
+  A.clear();
+  for(size_t i = 0; i < size; ++i) {
+    for(std::list<double>::const_iterator it = B[i].begin(); it != B[i].end(); ++it) {
+      A.push_back(*it);
     }
   }
-  return max;
 }
-
-void COUNTING_SORT(std::vector<int>& A, int exp) {
-  
-  std::vector<int> B(A.size()); 
-  std::vector<int> C(10);
-
-  for(size_t i = 0; i < A.size(); ++i) {
-    ++C[(A[i] / exp) % 10];
-  }
-
-  for(int i = 1; i < 10; ++i) {
-    C[i] += C[i - 1];
-  }
-
-  for(int i = static_cast<int>(A.size()) - 1; i >= 0; --i) {
-    B[C[(A[i] / exp) % 10] - 1] = A[i];
-    --C[(A[i] / exp) % 10];
-  }
-
-  std::swap_ranges(A.begin(), A.end(), B.begin());
-}
-
-void RADIX_SORT(std::vector<int>& A) {
-  int max = get_max(A);
-  for(int exp = 1; max / exp > 0; exp *= 10) {
-    COUNTING_SORT(A, exp);
-  }
-}
-
 
 int main() {
 
@@ -50,14 +56,14 @@ int main() {
     std::cin >> number;
   }
 
-  std::vector<int> A(number);
+  std::vector<double> A(number);
 
   for(int i = 0; i < number; ++i) {
     std::cout << "A[" << i << "] = ";
     std::cin >> A[i];
   }
 
-  RADIX_SORT(A);
+  BUCKET_SORT(A);
 
   for(int i = 0; i < number; ++i) {
     std::cout << A[i] << ' ';
