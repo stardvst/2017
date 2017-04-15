@@ -1,161 +1,58 @@
 #ifndef BINARY_TREE_HPP
 #define BINARY_TREE_HPP
 
+#include <algorithm>
 #include <iostream>
+#include <numeric>
 #include <stack>
 #include <queue>
+#include "Element.hpp"
 #include "Node.hpp"
 
 
 template<typename T>
 class Binary_tree {
 public:
-  Binary_tree(Node<T>* r = 0) : root(r) {}
-
-  void inorder() const;
-  void inorder_iter() const;
-
-  void postorder() const;
-  void postorder_iter() const;
-
-  void preorder() const;
-  void preorder_iter() const;
+  Binary_tree(Element<T>*, int);
+  ~Binary_tree() {
+    //_destroy(root);
+    _destroy_iter();
+    root = 0;
+  }
 
   void levelorder() const;
-
+  int leaf_count() const;
+  int height() const;
+  int width() const;
 private:
-  void _inorder(Node<T>*) const;
-  void _postorder(Node<T>*) const;
-  void _preorder(Node<T>*) const;
+  int _leaf_count(Node<T>*) const;
+  int _height(Node<T>*) const;
+  int _width(Node<T>*) const;
+  void _destroy(Node<T>*);
+  void _destroy_iter();
 private:
   Node<T>* root;
 };
 
 
 template<typename T>
-void Binary_tree<T>::inorder() const {
-  _inorder(root);
-}
+Binary_tree<T>::Binary_tree(Element<T>* arr, int size) {
+  Node<T>** new_arr = new Node<T>*[size];
 
-template<typename T>
-void Binary_tree<T>::_inorder(Node<T>* ptr) const {
-  if(ptr != 0) {
-    _inorder(ptr->left);
-    std::cout << ptr->value << ' ';
-    _inorder(ptr->right);
+  for(int i = 0; i < size; ++i) {
+    new_arr[i] = new Node<T>(arr[i].value);
   }
-}
+  root = new_arr[0];
 
-template<typename T>
-void Binary_tree<T>::inorder_iter() const {
-  std::stack<Node<T>*> stack;
-  Node<T>* node = root;
-
-  while(node || !stack.empty()) {
-    if(node) {
-      stack.push(node);
-      node = node->left;
-    } else {
-      node = stack.top();
-      stack.pop();
-      std::cout << node->value << ' ';
-      node = node->right;
+  for(int i = 0; i < size; ++i) {
+    if(arr[i].left != -1) {
+      new_arr[i]->left = new_arr[arr[i].left];
+    }
+    if(arr[i].right != -1) {
+      new_arr[i]->right = new_arr[arr[i].right];
     }
   }
 }
-
-
-template<typename T>
-void Binary_tree<T>::postorder() const {
-  _postorder(root);
-}
-
-template<typename T>
-void Binary_tree<T>::_postorder(Node<T>* ptr) const {
-  if(ptr != 0) {
-    _postorder(ptr->left);
-    _postorder(ptr->right);
-    std::cout << ptr->value << ' ';
-  }
-}
-
-template<typename T>
-void Binary_tree<T>::postorder_iter() const {
-  std::stack<Node<T>*> stack;
-  Node<T>* node = root;
-
-  while(true) {
-
-    while(node) {
-      stack.push(node);
-      node = node->left;
-    }
-
-    node = stack.top();
-    if(node->right == 0) {
-      stack.pop();
-      std::cout << node->value << ' ';
-
-      Node<T>* top = stack.top();
-      if(!stack.empty() && node == top->right) {
-        std::cout << top->value << ' ';
-        stack.pop();
-      }
-
-    }
-
-    if(stack.empty()) {
-      break;
-    }
-
-    if(stack.top() != 0) {
-      node = stack.top();
-      node = node->right;
-    } else {
-      node = 0;
-    }
-
-  }
-}
-
-
-template<typename T>
-void Binary_tree<T>::preorder() const {
-  _preorder(root);
-}
-
-template<typename T>
-void Binary_tree<T>::_preorder(Node<T>* ptr) const {
-  if(ptr != 0) {
-    std::cout << ptr->value << ' ';
-    _preorder(ptr->left);
-    _preorder(ptr->right);
-  }
-}
-
-template<typename T>
-void Binary_tree<T>::preorder_iter() const {
-  if(!root) {
-    return;
-  }
-
-  std::stack<Node<T>*> stack;
-  stack.push(root);
-
-  while(!stack.empty()) {
-    Node<T>* node = stack.top();
-    std::cout << node->value << ' ';
-    stack.pop();
-
-    if(node->right) {
-      stack.push(node->right);
-    }
-    if(node->left) {
-      stack.push(node->left);
-    }
-  }
-}
-
 
 template<typename T>
 void Binary_tree<T>::levelorder() const {
@@ -176,6 +73,107 @@ void Binary_tree<T>::levelorder() const {
         queue.push(node->right);
       }
     }
+  }
+}
+
+template<typename T>
+int Binary_tree<T>::leaf_count() const {
+  return _leaf_count(root);
+}
+
+template<typename T>
+int Binary_tree<T>::_leaf_count(Node<T>* ptr) const {
+  if(ptr == 0) {
+    return 0;
+  }
+  if(ptr->left == 0 && ptr->right == 0) {
+    return 1;
+  }
+  return _leaf_count(ptr->left) + _leaf_count(ptr->right);
+}
+
+template<typename T>
+int Binary_tree<T>::height() const {
+  return _height(root);
+}
+
+template<typename T>
+int Binary_tree<T>::_height(Node<T>* ptr) const {
+  if(ptr == 0 || (ptr->left == 0 && ptr->right == 0)) {
+    return 0;
+  }
+  return 1 + std::max(_height(ptr->left), _height(ptr->right));
+}
+
+template<typename T>
+int Binary_tree<T>::width() const {
+  return _width(root);
+}
+
+template<typename T>
+int Binary_tree<T>::_width(Node<T>* ptr) const {
+  if(!root) {
+    return 0;
+  }
+
+  std::queue<Node<T>*> queue;
+  int level_count = 1;
+  int max = std::numeric_limits<int>::min();
+
+  queue.push(ptr);
+  while(!queue.empty()) {
+    level_count = static_cast<int>(queue.size());
+    if(level_count > max) {
+      max = level_count;
+    }
+
+    while(level_count > 0) {
+      Node<T>* node = queue.front();
+      queue.pop();
+      if(node->left) {
+        queue.push(node->left);
+      }
+      if(node->right) {
+        queue.push(node->right);
+      }
+      --level_count;
+    }
+
+  }
+
+  return max;
+}
+
+template<typename T>
+void Binary_tree<T>::_destroy(Node<T>* ptr) {
+  if(ptr != 0) {
+    _destroy(ptr->left);
+    _destroy(ptr->right);
+    delete ptr;
+  }
+}
+
+template<typename T>
+void Binary_tree<T>::_destroy_iter() {
+  if(root == 0) {
+    return;
+  }
+
+  std::queue<Node<T>*> queue;
+  queue.push(root);
+
+  while(!queue.empty()) {
+    Node<T>* node = queue.front();
+    queue.pop();
+
+    if(node->left) {
+      queue.push(node->left);
+    }
+    if(node->right) {
+      queue.push(node->right);
+    }
+
+    delete node;
   }
 }
 
