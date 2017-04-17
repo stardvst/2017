@@ -1,46 +1,32 @@
 #include <iostream>
 #include <thread>
-#include <vector>
 #include <mutex>
-#include <Windows.h>
 
 
-std::vector<int> vec;
-std::mutex mutex;
+std::mutex m;
 
-void push() {
-  mutex.lock();
-  for(int i = 0; i != 10; ++i) {
-    std::cout << "Push " << i << std::endl;
-    Sleep(500);
-    vec.push_back(i);
-  }
-  mutex.unlock();
-}
-
-
-void pop() {
-  mutex.lock();
-  for(int i = 0; i != 10; ++i) {
-    if(vec.size() > 0) {
-      int val = vec.back();
-      vec.pop_back();
-      std::cout << "Pop " << val << std::endl;
-    }
-    Sleep(500);
-  }
-  mutex.unlock();
+void make_a_call() {
+  m.lock();
+  std::cout << "Hello my friend, this is " << std::this_thread::get_id() << '\n';
+  m.unlock();
 }
 
 
 int main() {
 
-  std::thread push(push);
-  std::thread pop(pop);
-  if(push.joinable())
-    push.join();
-  if(pop.joinable())
-    pop.join();
+  std::thread person1(make_a_call);
+  std::thread person2(make_a_call);
+  std::thread person3(make_a_call);
+
+  if(person1.joinable()) {
+    person1.join();
+  }
+  if(person2.joinable()) {
+    person2.join();
+  }
+  if(person3.joinable()) {
+    person3.join();
+  }
 
   std::cin.get();
   return 0;
