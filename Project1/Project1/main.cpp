@@ -1,34 +1,20 @@
 #include <iostream>
-#include <thread>
-#include <mutex>
+#include <string>
+#include <vector>
+#include "Calc.hpp"
 
 
-std::mutex m;
+int main(int argc, char* argv[]) {
 
-void make_a_call() {
-  m.lock();
-  std::cout << "Hello my friend, this is " << std::this_thread::get_id() << '\n';
-  m.unlock();
-}
+  if(argc == 4) {
+    std::vector<std::string> args(argv, argv + argc);
 
-
-int main() {
-
-  std::thread person1(make_a_call);
-  std::thread person2(make_a_call);
-  std::thread person3(make_a_call);
-
-  if(person1.joinable()) {
-    person1.join();
-  }
-  if(person2.joinable()) {
-    person2.join();
-  }
-  if(person3.joinable()) {
-    person3.join();
+    Calc c("calc.txt", args);
+    c.evaluate();
+    std::cout << "see \"calc.txt\" for the result.";
+  } else {
+    std::cerr << "Usage: <program> <function> <range> <step>\n";
   }
 
-  std::cin.get();
   return 0;
 }
-
