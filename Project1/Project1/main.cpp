@@ -10,32 +10,32 @@
 
 int main() {
 
-  std::ifstream infile("str_array.txt");
+  std::ifstream infile("str_matrix.txt");
 
-  std::map<std::string, std::pair<int, std::list<int> > > words;
+  std::map<std::string, std::pair<int, std::list<int> > > lines;
 
-  std::string word;
+  std::string line;
   int index = 0;
-  while(infile >> word) {
-    if(words.find(word) != words.end()) {
-      ++words[word].first; // ++frequency
-      words[word].second.push_back(index);
+  while(std::getline(infile, line)) {
+    if(lines.find(line) != lines.end()) {
+      ++lines[line].first; // ++frequency
+      lines[line].second.push_back(index);
     } else {
-      words[word] = std::make_pair<int, std::list<int> >(1, std::list<int>());
-      words[word].second.push_back(index);
+      lines[line] = std::make_pair<int, std::list<int> >(1, std::list<int>());
+      lines[line].second.push_back(index);
     }
     ++index;
   }
 
 
-  std::ofstream outfile("unique_if.txt", std::ios::trunc);
+  std::ofstream outfile("unique_m_if.txt", std::ios::trunc);
   outfile
     << std::setw(11) << "word" << std::setw(9) << '|'
     << std::setw(9) << "freq." << std::setw(5) << '|'
     << std::setw(20) << "indexes" << std::setw(12) << '|'
     << "\n------------------------------------------------------------------\n";
   for(std::map<std::string, std::pair<int, std::list<int> > >::const_iterator
-      it = words.begin(); it != words.end(); ++it) {
+      it = lines.begin(); it != lines.end(); ++it) {
 
     outfile
       << std::setw(11) << it->first
@@ -51,7 +51,7 @@ int main() {
   }
 
 
-  std::cout << "see \"unique_if.txt\" for the result.";
+  std::cout << "see \"unique_m_if.txt\" for the result.";
 
   std::cin.get();
   return 0;
