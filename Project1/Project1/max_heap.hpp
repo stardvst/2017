@@ -2,40 +2,33 @@
 #define MAX_HEAP_HPP
 
 #include <vector>
-#include <memory>
 #include <limits>
-#include "Heap.hpp"
 
 
 template<typename T>
 class Max_Heap {
+  friend class Median;
 public:
-  Max_Heap();
+  Max_Heap() {}
   void BUILD_MAX_HEAP(const std::vector<T>&);
   void MAX_HEAPIFY(int);
   const T& MAXIMUM() const;
   void EXTRACT_MAXIMUM();
   void INSERT(const T&);
   void INCREASE_KEY(int, const T&);
+  void DELETE(int);
 private:
   int PARENT(int i) const { return i % 2 ? i / 2 : i / 2 - 1; }
   int LEFT(int i) const { return  2 * i + 1; }
   int RIGHT(int i) const { return 2 * i + 2; }
 private:
-  std::unique_ptr<Heap<T> > heap;
+  std::vector<T> heap;
 };
 
 
 template<typename T>
-Max_Heap<T>::Max_Heap() {
-  heap = std::make_unique<Heap<T> >();
-}
-
-template<typename T>
 void Max_Heap<T>::BUILD_MAX_HEAP(const std::vector<T>& v) {
-  heap->elements = std::move(v);
-  heap->length = static_cast<int>(v.size());
-  heap->heap_size = static_cast<int>(v.size());
+  heap = v;
 
   for(int i = static_cast<int>(v.size()) / 2 - 1; i >= 0; --i) {
     MAX_HEAPIFY(i);
@@ -44,56 +37,70 @@ void Max_Heap<T>::BUILD_MAX_HEAP(const std::vector<T>& v) {
 
 template<typename T>
 void Max_Heap<T>::MAX_HEAPIFY(int i) {
+  const size_t size = heap.size();
+
   int left = LEFT(i);
   int right = RIGHT(i);
   int largest;
-  if(left < heap->heap_size && heap->elements[left] > heap->elements[i]) {
+  if(left < size && heap[left] > heap[i]) {
     largest = left;
   } else {
     largest = i;
   }
-  if(right < heap->heap_size && heap->elements[right] > heap->elements[largest]) {
+  if(right < size && heap[right] > heap[largest]) {
     largest = right;
   }
   if(largest != i) {
-    std::swap(heap->elements[i], heap->elements[largest]);
+    std::swap(heap[i], heap[largest]);
     MAX_HEAPIFY(largest);
   }
 }
 
 template<typename T>
 const T& Max_Heap<T>::MAXIMUM() const {
-  return heap->elements[0];
+  return heap[0];
 }
 
 template<typename T>
 void Max_Heap<T>::EXTRACT_MAXIMUM() {
-  if(heap->heap_size < 1) {
+  const size_t size = heap.size();
+  if(size < 1) {
     std::cerr << "heap underflow.\n";
   }
-  heap->elements[0] = heap->elements[heap->heap_size - 1];
-  heap->elements.erase(heap->elements.begin() + heap->heap_size - 1);
-  --heap->heap_size;
+  heap[0] = heap[size - 1];
+  heap.erase(heap.begin() + size - 1);
   MAX_HEAPIFY(0);
 }
 
 template<typename T>
 void Max_Heap<T>::INSERT(const T& key) {
-  ++heap->length;
-  ++heap->heap_size;
-  heap->elements.push_back(std::numeric_limits<T>::min());
-  INCREASE_KEY(heap->heap_size - 1, key);
+  heap.push_back(std::numeric_limits<T>::min());
+  INCREASE_KEY(static_cast<int>(heap.size()) - 1, key);
 }
 
 template<typename T>
 void Max_Heap<T>::INCREASE_KEY(int i, const T& key) {
-  if(key < heap->elements[heap->heap_size - 1]) {
+  const size_t size = heap.size();
+  if(key < heap[size - 1]) {
     std::cerr << "new key is smaller than current key.\n";
   }
-  heap->elements[heap->heap_size - 1] = key;
-  while(i > 0 && heap->elements[PARENT(i)] < heap->elements[i]) {
-    std::swap(heap->elements[PARENT(i)], heap->elements[i]);
+  heap[size - 1] = key;
+  while(i > 0 && heap[PARENT(i)] < heap[i]) {
+    std::swap(heap[PARENT(i)], heap[i]);
     i = PARENT(i);
+  }
+}
+
+template<typename T>
+void Max_Heap<T>::DELETE(int i) {
+  const size_t size = heap.size();
+  if(heap[i] < heap[size - 1]) {
+    INCREASE_KEY(i, heap[size - 1]);
+    heap.erase(heap.begin() + size - 1);
+  } else {
+    heap[i] = heap[size - 1];
+    heap.erase(heap.begin() + size - 1);
+    MAX_HEAPIFY(i);
   }
 }
 

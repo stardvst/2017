@@ -12,8 +12,9 @@ int main() {
   max_heap.BUILD_MAX_HEAP(v);
   
   max_heap.INSERT(23);
+  max_heap.DELETE(1); // 1 is index
 
-  for(int i = 0; i < 10; ++i) {
+  for(int i = 0; i < 9; ++i) {
     std::cout << "max: " << max_heap.MAXIMUM() << '\n';
     max_heap.EXTRACT_MAXIMUM();
   }
@@ -24,8 +25,9 @@ int main() {
   min_heap.BUILD_MIN_HEAP(v);
 
   min_heap.INSERT(4);
+  min_heap.DELETE(3); // 3 is index
 
-  for(int i = 0; i < 10; ++i) {
+  for(int i = 0; i < 9; ++i) {
     std::cout << "min: " << min_heap.MINIMUM() << '\n';
     min_heap.EXTRACT_MINIMUM();
   }
