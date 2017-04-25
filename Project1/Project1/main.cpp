@@ -7,10 +7,10 @@ int main() {
 
   std::vector<int> v = { 5,3,17,10,84,19,6,22,9 };
 
-  
+
   Max_Heap<int> max_heap;
   max_heap.BUILD_MAX_HEAP(v);
-  
+
   max_heap.INSERT(23);
   max_heap.DELETE(1); // 1 is index
 

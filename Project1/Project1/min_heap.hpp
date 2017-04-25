@@ -7,7 +7,6 @@
 
 template<typename T>
 class Min_Heap {
-  friend class Median;
 public:
   Min_Heap() {}
   void BUILD_MIN_HEAP(const std::vector<T>&);

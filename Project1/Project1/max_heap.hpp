@@ -7,7 +7,6 @@
 
 template<typename T>
 class Max_Heap {
-  friend class Median;
 public:
   Max_Heap() {}
   void BUILD_MAX_HEAP(const std::vector<T>&);
