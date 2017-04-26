@@ -15,6 +15,7 @@ int main() {
     std::map<std::string, std::set<int> > words;
 
     std::string row;
+    int max_columns = 0;
     while(std::getline(infile, row)) {
       
       int column = 0;
@@ -24,11 +25,15 @@ int main() {
         words[word].insert(column++);
       }
 
+      if(column > max_columns) {
+        max_columns = column;
+      }
+
     }
 
     for(std::map<std::string, std::set<int> >::const_iterator it = words.begin();
         it != words.end(); ++it) {
-      if(it->second.size() == 1) { // word appears only in 1 column
+      if(it->second.size() == max_columns) { // word appears in all columns
         std::cout << it->first << '\n';
       }
     }
