@@ -8,7 +8,7 @@ int main() {
   std::ifstream infile;
   infile.open("numbers.txt");
 
-  if(infile.is_open()) {
+  if(infile.is_open() && infile.peek() != std::ifstream::traits_type::eof()) {
 
     int n = 0;
     double sum = 0;
@@ -23,8 +23,8 @@ int main() {
 
     double mean = sum / n;
 
-    std::cout << "standard deviation: " 
-      << std::sqrt(sum_of_squares / (n - 1) - mean * mean);
+    std::cout << "sample standard deviation: "
+      << std::sqrt((sum_of_squares - n * mean * mean) / (n - 1));
 
 
     infile.close();
