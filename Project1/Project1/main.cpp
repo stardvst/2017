@@ -4,18 +4,14 @@
 
 int main() {
 
-  int bin_size = 0;
-  while(bin_size <= 0) {
-    std::cout << "enter bin size: ";
-    std::cin >> bin_size;
+  int bin_count = 0;
+  while(bin_count <= 0) {
+    std::cout << "enter bin count: ";
+    std::cin >> bin_count;
   }
 
-  int anchor;
-  std::cout << "enter anchor: ";
-  std::cin >> anchor;
 
-
-  Histogram h("numbers.txt", bin_size, anchor);
+  Histogram h("numbers.txt", bin_count);
   h.create();
   std::cout << h;
 
