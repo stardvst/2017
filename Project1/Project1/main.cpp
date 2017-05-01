@@ -20,13 +20,19 @@ int main() {
 
         std::sort(v.begin(), v.end());
 
-        std::cout << "Q1: " << v[static_cast<int>(0.25 * v.size())]
-            << "\nQ3: " << v[static_cast<int>(0.75 * v.size())];
+        int n = 0;
+        while(n <= 0 || n > 100) {
+            std::cout << "calculating nth percentile, n = ";
+            std::cin >> n;
+        }
+
+
+        std::cout << "nth percentile: " << v[static_cast<int>(n * v.size() / 100) - 1];
 
         file.close();
     }
 
-
+    std::cin.get();
     std::cin.get();
     return 0;
 }
