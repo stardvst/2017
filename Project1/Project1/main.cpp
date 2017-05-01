@@ -63,19 +63,17 @@ int main() {
             v.push_back(value);
         }
 
-        int n = 0;
-        while(n <= 0 || n > 100) {
-            std::cout << "calculating nth percentile, n = ";
-            std::cin >> n;
-        }
+        int q1 = static_cast<int>(0.25 * v.size());
+        int q3 = static_cast<int>(0.75 * v.size());
 
-        std::nth_element(v.begin(), v.begin() + n * v.size() / 100, v.end());
-        std::cout << "nth percentile: " << v[n * v.size() / 100];
+        std::nth_element(v.begin(), v.begin() + q1, v.end());
+        std::cout << "Q1: " << v[q1];
+        std::nth_element(v.begin() + q1, v.begin() + q3, v.end());
+        std::cout << "\nQ3: " << v[q3];
 
         file.close();
     }
 
-    std::cin.get();
     std::cin.get();
     return 0;
 }
