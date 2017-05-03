@@ -1,20 +1,39 @@
 #include <iostream>
-#include <fstream>
-#include "quicksort.hpp"
 
+
+struct B {};
+
+struct A {
+    A() { 
+        ptr = new B[5]; 
+        count = new int(1);
+    }
+    A(const A& a) {
+        ptr = a.ptr;
+        ++count;
+    }
+    ~A() {
+        --count;
+        if(count == 0) {
+            delete[] ptr;
+        }
+    }
+    B* ptr;
+    int* count;
+};
+
+void f(A a) {
+    // std::cout << *(a.count); // can't do this, only original object has access to count
+    std::cout << 2;
+}
 
 int main() {
 
-  std::ifstream file;
-  file.open("numbers.txt");
-  
-  Quicksort<int> q(file);
-  file.close();
+    A a;
+    std::cout << *(a.count);
+    f(a);
+    std::cout << *(a.count);
 
-  q.multi_threaded();
-  q.print();
-  
-
-  std::cin.get();
-  return 0;
+    std::cin.get();
+    return 0;
 }
