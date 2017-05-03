@@ -1,20 +1,20 @@
 #include <iostream>
 #include <fstream>
-#include "mergesort.hpp"
+#include "quicksort.hpp"
 
 
 int main() {
 
-    std::ifstream file;
-    file.open("numbers.txt");
+  std::ifstream file;
+  file.open("numbers.txt");
+  
+  Quicksort<int> q(file);
+  file.close();
 
-    Mergesort<int> m(file);
-    file.close();
+  q.multi_threaded();
+  q.print();
+  
 
-    m.multi_threaded();
-    m.print();
-
-
-    std::cin.get();
-    return 0;
+  std::cin.get();
+  return 0;
 }
