@@ -35,7 +35,6 @@ int main() {
         rbt.inorder();
     }
 
-
     std::cin.get();
     return 0;
 }

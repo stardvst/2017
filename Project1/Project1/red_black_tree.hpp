@@ -173,13 +173,13 @@ void RedBlackTree<T>::remove(const T& value) {
     } else {
         y = predecessor(node);
         y_original_color = y->color;
-        x = y->right;
+        x = y->left;
         if(y->parent == node) {
             x->parent = y;
         } else {
-            transplant(y, y->right);
-            y->right = node->right;
-            y->right->parent = y;
+            transplant(y, y->left);
+            y->left = node->left;
+            y->left->parent = y;
         }
         transplant(node, y);
         y->right = node->right;
