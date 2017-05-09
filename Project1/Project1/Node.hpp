@@ -4,10 +4,13 @@
 
 template<typename T>
 struct Node {
-  T value;
-  Node* left;
-  Node* right;
-  Node(T v, Node* l = 0, Node* r = 0) : value(v), left(l), right(r) {}
+    Node(const T& v) : value(v), parent(0), left(0), right(0), color('r') {}
+
+    T value;
+    Node* parent;
+    Node* left;
+    Node* right;
+    char color;
 };
 
 #endif // !NODE_HPP
