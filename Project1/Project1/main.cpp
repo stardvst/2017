@@ -1,38 +1,28 @@
 #include <iostream>
+#include <fstream>
 #include "red_black_tree.hpp"
 
 
 int main() {
 
-    RedBlackTree<int> rbt;
-
-    int value;
-    std::cout << "enter red-black tree keys (ctrl+z to exit)...\n\nkey: ";
-    while(std::cin >> value) {
-        rbt.insert(value);
-        std::cout << "key: ";
-    }
-
-    std::cout << "\n\ttree: ";
-    rbt.inorder();
-
-    std::cin.clear();
+    std::ifstream file;
+    file.open("numbers.txt");
 
 
-    std::cout << "\n\nenter keys to delete (ctrl+z to exit)...\n\nkey: ";
-    while(std::cin >> value) {
-        if(!rbt.empty()) {
-            rbt.remove(value);
-            std::cout << "key: ";
-        } else {
-            std::cout << "\n\ttree is now empty.\n";
-            break;
+    if(file.is_open() && file.peek() != std::ifstream::traits_type::eof()) {
+        int size = 0;
+        RedBlackTreeAug<int> rbt;
+
+        int value;
+        while(file >> value) {
+            rbt.insert(value);
+            ++size;
         }
-    }
 
-    if(!rbt.empty()) {
-        std::cout << "\n\ttree: ";
-        rbt.inorder();
+        std::cout << "Q1: " << order_stat_select(rbt, size / 4)
+            << "\nQ3: " << order_stat_select(rbt, 3 * size / 4); 
+
+        file.close();
     }
 
     std::cin.get();

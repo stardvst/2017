@@ -9,8 +9,9 @@ struct Node {
     Node* left;
     Node* right;
     char color;
+    unsigned int size;
 
-    Node(const T& v) : value(v), parent(0), left(0), right(0), color('r') {}
+    Node(const T& v) : value(v), parent(0), left(0), right(0), color('r'), size(0) {}
 };
 
 #endif // !NODE_HPP

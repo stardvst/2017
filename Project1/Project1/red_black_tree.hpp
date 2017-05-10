@@ -8,10 +8,14 @@
 
 
 template<typename T>
-class RedBlackTree {
+class RedBlackTreeAug {
+    template<typename U>
+    friend const U& order_stat_select(const RedBlackTreeAug<U>&, int);
+    template<typename U>
+    friend int order_stat_rank(const RedBlackTreeAug<U>&, const U&);
 public:
-    RedBlackTree();
-    ~RedBlackTree();
+    RedBlackTreeAug();
+    ~RedBlackTreeAug();
 
     void insert(const T&);
     void remove(const T&);
@@ -45,7 +49,7 @@ private:
 
 
 template<typename T>
-RedBlackTree<T>::RedBlackTree() : nil(new Node<T>(0)), root(nil) {
+RedBlackTreeAug<T>::RedBlackTreeAug() : nil(new Node<T>(0)), root(nil) {
     nil->color = 'b';
     root->parent = nil;
     root->left = nil;
@@ -53,7 +57,7 @@ RedBlackTree<T>::RedBlackTree() : nil(new Node<T>(0)), root(nil) {
 }
 
 template<typename T>
-RedBlackTree<T>::~RedBlackTree() {
+RedBlackTreeAug<T>::~RedBlackTreeAug() {
     if(!empty()) {
         std::queue<Node<T>*> queue;
         queue.push(root);
@@ -76,7 +80,7 @@ RedBlackTree<T>::~RedBlackTree() {
 }
 
 template<typename T>
-void RedBlackTree<T>::insert(const T& value) {
+void RedBlackTreeAug<T>::insert(const T& value) {
 
     Node<T>* y = nil;
     Node<T>* x = root;
@@ -104,11 +108,16 @@ void RedBlackTree<T>::insert(const T& value) {
     node->left = nil;
     node->right = nil;
 
+    while(node != nil) {
+        ++node->size;
+        node = node->parent;
+    }
+
     insert_fixup(node);
 }
 
 template<typename T>
-void RedBlackTree<T>::insert_fixup(Node<T>*& node) {
+void RedBlackTreeAug<T>::insert_fixup(Node<T>*& node) {
     Node<T>* y = 0;
 
     while(node->parent->color == 'r') {
@@ -153,7 +162,7 @@ void RedBlackTree<T>::insert_fixup(Node<T>*& node) {
 
 
 template<typename T>
-void RedBlackTree<T>::remove(const T& value) {
+void RedBlackTreeAug<T>::remove(const T& value) {
     Node<T>* node = find_node(value);
 
     if(!node) {
@@ -187,6 +196,11 @@ void RedBlackTree<T>::remove(const T& value) {
         y->color = node->color;
     }
 
+    while(node != nil) {
+        --node->size;
+        node = node->parent;
+    }
+
     if(y_original_color == 'b') {
         remove_fixup(x);
     }
@@ -195,7 +209,7 @@ void RedBlackTree<T>::remove(const T& value) {
 }
 
 template<typename T>
-void RedBlackTree<T>::remove_fixup(Node<T>*& node) {
+void RedBlackTreeAug<T>::remove_fixup(Node<T>*& node) {
     while(node != root && node->color == 'b') {
 
         Node<T>* sibling;
@@ -228,7 +242,7 @@ void RedBlackTree<T>::remove_fixup(Node<T>*& node) {
             }
         } else {
             sibling = node->parent->left;
-            
+
             if(sibling->color == 'r') { // case 1
                 sibling->color = 'b';
                 node->parent->color = 'r';
@@ -261,7 +275,7 @@ void RedBlackTree<T>::remove_fixup(Node<T>*& node) {
 
 
 template<typename T>
-bool RedBlackTree<T>::find(const T& value) const {
+bool RedBlackTreeAug<T>::find(const T& value) const {
     Node<T>* tmp = root;
     while(tmp) {
         if(value < tmp->value) {
@@ -276,7 +290,7 @@ bool RedBlackTree<T>::find(const T& value) const {
 }
 
 template<typename T>
-const T& RedBlackTree<T>::maximum() const {
+const T& RedBlackTreeAug<T>::maximum() const {
     assert(!empty());
     Node<T>* tmp = root;
     while(tmp->right) {
@@ -286,7 +300,7 @@ const T& RedBlackTree<T>::maximum() const {
 }
 
 template<typename T>
-const T& RedBlackTree<T>::minimum() const {
+const T& RedBlackTreeAug<T>::minimum() const {
     assert(!empty());
     Node<T>* tmp = root;
     while(tmp->left) {
@@ -296,7 +310,7 @@ const T& RedBlackTree<T>::minimum() const {
 }
 
 template<typename T>
-void RedBlackTree<T>::inorder() const {
+void RedBlackTreeAug<T>::inorder() const {
     assert(!empty());
     std::stack<Node<T>*> stack;
 
@@ -314,12 +328,12 @@ void RedBlackTree<T>::inorder() const {
 }
 
 template<typename T>
-bool RedBlackTree<T>::empty() const {
+bool RedBlackTreeAug<T>::empty() const {
     return root->left == nil && root->right == nil;
 }
 
 template<typename T>
-void RedBlackTree<T>::left_rotate(Node<T>*& node) {
+void RedBlackTreeAug<T>::left_rotate(Node<T>*& node) {
     Node<T>* y = node->right;
     node->right = y->left;
     if(y->left != nil) {
@@ -336,10 +350,13 @@ void RedBlackTree<T>::left_rotate(Node<T>*& node) {
     }
     y->left = tmp;
     tmp->parent = y;
+
+    y->size = tmp->size;
+    tmp->size = tmp->left->size + tmp->right->size + 1;
 }
 
 template<typename T>
-void RedBlackTree<T>::right_rotate(Node<T>*& node) {
+void RedBlackTreeAug<T>::right_rotate(Node<T>*& node) {
     Node<T>* y = node->left;
     node->left = y->right;
     if(y->right != nil) {
@@ -356,10 +373,13 @@ void RedBlackTree<T>::right_rotate(Node<T>*& node) {
     }
     y->right = tmp;
     tmp->parent = y;
+
+    y->size = tmp->size;
+    tmp->size = tmp->left->size + tmp->right->size + 1;
 }
 
 template<typename T>
-void RedBlackTree<T>::transplant(Node<T>* node1, Node<T>* node2) {
+void RedBlackTreeAug<T>::transplant(Node<T>* node1, Node<T>* node2) {
     if(node1->parent == nil) {
         root = node2;
     } else if(node1 == node1->parent->left) {
@@ -371,7 +391,7 @@ void RedBlackTree<T>::transplant(Node<T>* node1, Node<T>* node2) {
 }
 
 template<typename T>
-Node<T>* RedBlackTree<T>::predecessor(Node<T>* node) const {
+Node<T>* RedBlackTreeAug<T>::predecessor(Node<T>* node) const {
     if(node->left != nil) {
         return get_max_node(node->left);
     }
@@ -384,7 +404,7 @@ Node<T>* RedBlackTree<T>::predecessor(Node<T>* node) const {
 }
 
 template<typename T>
-Node<T>* RedBlackTree<T>::successor(Node<T>* node) const {
+Node<T>* RedBlackTreeAug<T>::successor(Node<T>* node) const {
     if(node->right != nil) {
         return get_min_node(node->right);
     }
@@ -398,7 +418,7 @@ Node<T>* RedBlackTree<T>::successor(Node<T>* node) const {
 
 
 template<typename T>
-Node<T>* RedBlackTree<T>::get_min_node(Node<T>* node) const {
+Node<T>* RedBlackTreeAug<T>::get_min_node(Node<T>* node) const {
     while(node->left != nil) {
         node = node->left;
     }
@@ -406,7 +426,7 @@ Node<T>* RedBlackTree<T>::get_min_node(Node<T>* node) const {
 }
 
 template<typename T>
-Node<T>* RedBlackTree<T>::get_max_node(Node<T>* node) const {
+Node<T>* RedBlackTreeAug<T>::get_max_node(Node<T>* node) const {
     while(node->right != nil) {
         node = node->right;
     }
@@ -414,7 +434,7 @@ Node<T>* RedBlackTree<T>::get_max_node(Node<T>* node) const {
 }
 
 template<typename T>
-Node<T>* RedBlackTree<T>::find_node(const T& value) const {
+Node<T>* RedBlackTreeAug<T>::find_node(const T& value) const {
     Node<T>* tmp = root;
     while(tmp != nil) {
         if(value < tmp->value) {
@@ -426,6 +446,47 @@ Node<T>* RedBlackTree<T>::find_node(const T& value) const {
         }
     }
     return 0;
+}
+
+
+template<typename T>
+const T& order_stat_select(const RedBlackTreeAug<T>& rbt, int i) {
+    int rank = 0;
+
+    Node<T>* tmp = rbt.root;
+    while(true) {
+        rank = tmp->left->size + 1;
+        if(i == rank) {
+            return tmp->value;
+        }
+        if(i < rank) {
+            tmp = tmp->left;
+        } else {
+            tmp = tmp->right;
+            i -= rank;
+        }
+    }
+}
+
+
+template<typename U>
+int order_stat_rank(const RedBlackTreeAug<U>& rbt, const U& value) {
+    int i = 0;
+    int rank = 0;
+
+    Node<T>* tmp = rbt.root;
+    while(true) {
+        rank = tmp->left->size + 1;
+        if(value == tmp->value) {
+            return i + rank;
+        }
+        if(value < tmp->value) {
+            tmp = tmp->left;
+        } else {
+            tmp = tmp->right;
+            i += rank;
+        }
+    }
 }
 
 #endif // !RED_BLACK_TREE_HPP
