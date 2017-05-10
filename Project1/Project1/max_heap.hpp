@@ -8,6 +8,9 @@
 
 template<typename T>
 struct Max_Heap : public Heap<T, std::greater<T>> {
+    template<typename T>
+    friend class Median;
+
     void build_heap(const std::vector<T>&);
     void heapify(int);
     void insert(const T&);

@@ -50,7 +50,6 @@ void Heap<T, C>::heapify(int i) {
         if(right < size && cmp(heap[right], heap[element])) {
             element = right;
         }
-
         if(element == i) {
             return;
         }
