@@ -1,34 +1,40 @@
 #include <iostream>
-#include <fstream>
-#include "red_black_tree.hpp"
+#include "max_heap.hpp"
+#include "min_heap.hpp"
 
 
 int main() {
 
-    std::ifstream file;
-    file.open("numbers.txt");
+    std::vector<int> v;
 
-
-    if(file.is_open() && file.peek() != std::ifstream::traits_type::eof()) {
-        int size = 0;
-        RedBlackTreeAug<int> rbt;
-
-        int value;
-        while(file >> value) {
-            rbt.insert(value);
-            ++size;
-        }
-
-        int n = 0;
-        while(n <= 0 || n > 100) {
-            std::cout << "calculating nth percentile, n = ";
-            std::cin >> n;
-        }
-
-        std::cout << "nth percentile: " << order_stat_select(rbt, n * size / 100);
-
-        file.close();
+    int value;
+    std::cout << "enter heap elements (ctrl+d to exit)...\n\nvalue: ";
+    while(std::cin >> value) {
+        v.push_back(value);
+        std::cout << "value: ";
     }
+
+
+    Max_Heap<int> max_heap;
+    max_heap.build_heap(v);
+
+    const size_t size = v.size();
+
+    std::cout << "\n\nextracting max elements from max-heap...\n";
+    for(size_t i = 0; i < v.size(); ++i) {
+        std::cout << "current max: " << max_heap.maximum() << '\n';
+        max_heap.extract();
+    }
+
+    Min_Heap<int> min_heap;
+    min_heap.build_heap(v);
+
+    std::cout << "\n\nextracting min elements from min-heap...\n";
+    for(size_t i = 0; i < size; ++i) {
+        std::cout << "current min: " << min_heap.minimum() << '\n';
+        min_heap.extract();
+    }
+
 
     std::cin.get();
     std::cin.get();

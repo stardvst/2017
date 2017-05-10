@@ -1,83 +1,44 @@
 #ifndef MAX_HEAP_HPP
 #define MAX_HEAP_HPP
 
+#include <functional>
 #include <vector>
-#include <limits>
+#include "heap.hpp"
 
 
 template<typename T>
-class Max_Heap {
-  template<typename U>
-  friend class Median;
-public:
-  Max_Heap() {}
-  void MAX_HEAPIFY(int);
-  const T& MAXIMUM() const;
-  void EXTRACT_MAXIMUM();
-  void INSERT(const T&);
-  void INCREASE_KEY(int, const T&);
-private:
-  int PARENT(int i) const { return i % 2 ? i / 2 : i / 2 - 1; }
-  int LEFT(int i) const { return  2 * i + 1; }
-  int RIGHT(int i) const { return 2 * i + 2; }
-private:
-  std::vector<T> heap;
+struct Max_Heap : public Heap<T, std::greater<T>> {
+    void build_heap(const std::vector<T>&);
+    void heapify(int);
+    void insert(const T&);
+    void extract();
+    const T& maximum() const;
 };
 
 
 template<typename T>
-void Max_Heap<T>::MAX_HEAPIFY(int i) {
-  const size_t size = heap.size();
-
-  int left = LEFT(i);
-  int right = RIGHT(i);
-  int largest;
-  if(left < size && heap[left] > heap[i]) {
-    largest = left;
-  } else {
-    largest = i;
-  }
-  if(right < size && heap[right] > heap[largest]) {
-    largest = right;
-  }
-  if(largest != i) {
-    std::swap(heap[i], heap[largest]);
-    MAX_HEAPIFY(largest);
-  }
+void Max_Heap<T>::build_heap(const std::vector<T>& v) {
+    return Heap<T, std::greater<T> >::build_heap(v);
 }
 
 template<typename T>
-const T& Max_Heap<T>::MAXIMUM() const {
-  return heap[0];
+void Max_Heap<T>::heapify(int i) {
+    return Heap<T, std::greater<T> >::heapify(i);
 }
 
 template<typename T>
-void Max_Heap<T>::EXTRACT_MAXIMUM() {
-  const size_t size = heap.size();
-  if(size > 0) {
-    heap[0] = heap[size - 1];
-    heap.erase(heap.begin() + size - 1);
-    MAX_HEAPIFY(0);
-  }
+void Max_Heap<T>::extract() {
+    return Heap<T, std::greater<T> >::extract();
 }
 
 template<typename T>
-void Max_Heap<T>::INSERT(const T& key) {
-  heap.push_back(std::numeric_limits<T>::min());
-  INCREASE_KEY(static_cast<int>(heap.size()) - 1, key);
+void Max_Heap<T>::insert(const T& key) {
+    return Heap<T, std::greater<T> >::insert(key);
 }
 
 template<typename T>
-void Max_Heap<T>::INCREASE_KEY(int i, const T& key) {
-  const size_t size = heap.size();
-  if(key > heap[size - 1]) {
-    heap[size - 1] = key;
-    while(i > 0 && heap[PARENT(i)] < heap[i]) {
-      std::swap(heap[PARENT(i)], heap[i]);
-      i = PARENT(i);
-    }
-  }
+const T& Max_Heap<T>::maximum() const {
+    return Heap<T, std::greater<T> >::heap[0];
 }
-
 
 #endif // !MAX_HEAP_HPP
