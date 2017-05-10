@@ -449,8 +449,8 @@ Node<T>* RedBlackTreeAug<T>::find_node(const T& value) const {
 }
 
 
-template<typename T>
-const T& order_stat_select(const RedBlackTreeAug<T>& rbt, int i) {
+template<typename U>
+const U& order_stat_select(const RedBlackTreeAug<U>& rbt, int i) {
     int rank = 0;
 
     Node<T>* tmp = rbt.root;

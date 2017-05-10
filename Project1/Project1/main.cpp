@@ -19,12 +19,18 @@ int main() {
             ++size;
         }
 
-        std::cout << "Q1: " << order_stat_select(rbt, size / 4)
-            << "\nQ3: " << order_stat_select(rbt, 3 * size / 4); 
+        int n = 0;
+        while(n <= 0 || n > 100) {
+            std::cout << "calculating nth percentile, n = ";
+            std::cin >> n;
+        }
+
+        std::cout << "nth percentile: " << order_stat_select(rbt, n * size / 100);
 
         file.close();
     }
 
+    std::cin.get();
     std::cin.get();
     return 0;
 }
