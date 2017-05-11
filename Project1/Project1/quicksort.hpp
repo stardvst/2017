@@ -10,8 +10,6 @@
 #include <ctime>
 
 
-#define MAX_THREADS 8
-
 template<typename T>
 class Quicksort {
 public:
@@ -22,15 +20,18 @@ public:
 private:
     void single_threaded(int, int);
     void multi_threaded(int, int);
+    void multi_threaded_iter(int, int);
     int partition(int, int);
 private:
     std::vector<T> v;
     int threads;
+    const int max_threads;
 };
 
 
 template<typename T>
-Quicksort<T>::Quicksort(std::ifstream& file) : threads(0) {
+Quicksort<T>::Quicksort(std::ifstream& file) 
+    : threads(0), max_threads(std::thread::hardware_concurrency()) {
     if(file.is_open()) {
         T value;
         while(file >> value) {
@@ -46,14 +47,26 @@ void Quicksort<T>::single_threaded() {
 
 template<typename T>
 void Quicksort<T>::single_threaded(int low, int high) {
-    if(low < high) {
-        std::srand(static_cast<unsigned>(std::time(0)));
-        int pivot = std::rand() % (high - low + 1) + low;
-        std::swap(v[pivot], v[high]);
+    std::stack<T> stack;
+    stack.push(low);
+    stack.push(high);
 
-        int q = partition(low, high);
-        single_threaded(low, q - 1);
-        single_threaded(q + 1, high);
+    while(!stack.empty()) {
+        high = stack.top();
+        stack.pop();
+        low = stack.top();
+        stack.pop();
+
+        int pivot = partition(low, high);
+
+        if(pivot - 1 > low) {
+            stack.push(low);
+            stack.push(pivot - 1);
+        }
+        if(pivot + 1 < high) {
+            stack.push(pivot + 1);
+            stack.push(high);
+        }
     }
 }
 
@@ -65,7 +78,7 @@ void Quicksort<T>::multi_threaded() {
 template<typename T>
 void Quicksort<T>::multi_threaded(int low, int high) {
     if(low < high) {
-        if(high - low + 1 <= 100 || threads >= MAX_THREADS) {
+        if(high - low + 1 <= v.size() / max_threads || threads >= max_threads) {
             single_threaded(low, high);
         } else {
             threads += 2;

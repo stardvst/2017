@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include "mergesort.hpp"
+#include "quicksort.hpp"
 
 
 int main() {
@@ -8,11 +8,11 @@ int main() {
     std::ifstream file;
     file.open("numbers.txt");
 
-    Mergesort<int> m(file);
+    Quicksort<int> q(file);
     file.close();
 
-    m.single_threaded();
-    m.print();
+    q.multi_threaded();
+    q.print();
 
 
     std::cin.get();
