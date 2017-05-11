@@ -6,8 +6,6 @@
 #include <vector>
 
 
-#define MAX_THREADS 8
-
 template<typename T>
 class Mergesort {
 public:
@@ -22,11 +20,13 @@ private:
 private:
     std::vector<T> v;
     int threads;
+    const int max_threads;
 };
 
 
 template<typename T>
-Mergesort<T>::Mergesort(std::ifstream& file) : threads(0) {
+Mergesort<T>::Mergesort(std::ifstream& file)
+    : threads(0), max_threads(std::thread::hardware_concurrency()) {
     if(file.is_open() && file.peek() != std::ifstream::traits_type::eof()) {
         T value;
         while(file >> value) {
@@ -59,10 +59,10 @@ void Mergesort<T>::multi_threaded() {
 
 template<typename T>
 void Mergesort<T>::multi_threaded(std::vector<T>& tmp, int low, int high) {
-    if(high - low + 1 < 100 || threads >= MAX_THREADS) {
+    if(high - low + 1 <= v.size() / max_threads || threads >= max_threads) {
         single_threaded(tmp, low, high);
     } else {
-        threads += 2;;
+        threads += 2;
 
         int mid = low + (high - low) / 2;
         std::thread t1([&] { multi_threaded(tmp, low, mid); });

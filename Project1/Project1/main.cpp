@@ -1,12 +1,18 @@
 #include <iostream>
-#include "median.hpp"
+#include <fstream>
+#include "mergesort.hpp"
 
 
 int main() {
 
-    Median<int> median("numbers.txt");
+    std::ifstream file;
+    file.open("numbers.txt");
 
-    std::cout << "median: " << median.get() << std::endl;
+    Mergesort<int> m(file);
+    file.close();
+
+    m.single_threaded();
+    m.print();
 
 
     std::cin.get();
