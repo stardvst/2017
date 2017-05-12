@@ -1,21 +1,20 @@
-#include <functional>
 #include <iostream>
-#include <fstream>
-#include "quicksort.hpp"
+#include <string>
+#include <vector>
+#include "Calc.hpp"
 
 
-int main() {
+int main(int argc, char* argv[]) {
 
-    std::ifstream file;
-    file.open("numbers.txt");
+    if(argc == 3) {
+        std::vector<std::string> args(argv, argv + argc);
 
-    Quicksort<int, std::greater<int>> q(file);
-    file.close();
+        Calc c("calc.txt", args);
+        c.evaluate();
+        std::cout << "see \"calc.txt\" for the result.";
+    } else {
+        std::cerr << "Usage: <program> <function> <range> <step>\n";
+    }
 
-    q.single_threaded();
-    q.print();
-
-
-    std::cin.get();
     return 0;
 }

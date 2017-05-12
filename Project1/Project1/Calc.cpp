@@ -4,202 +4,65 @@
 #include <fstream>
 #include <utility>
 #include <thread>
+#include <random>
 #include <vector>
 #include <string>
 #include <cctype>
+#include <limits>
 #include <stack>
 #include <mutex>
+#include <regex>
 #include <cmath>
+#include <set>
 #include "Calc.hpp"
-
-
-std::mutex Calc::m;
 
 
 Calc::Calc(const std::string& of, const std::vector<std::string>& args) : outfile(of), argv(args) {}
 
 
 void Calc::evaluate() {
-    std::string var = get_varname(argv[1]);
-    std::string function = get_function(argv[1]);
 
-    if(var == "" || function == "") {
-        std::cerr << "Variable and function can't be empty.\n";
-        return;
-    }
-    if(function.find(var) == std::string::npos) {
-        std::cerr << "The function must contain the variable " << var << '\n';
-        return;
-    }
-    if(unknown_identifier_found(function, var)) {
-        std::cerr << "Function should contain only " << var << ".\n";
-        return;
-    }
+    std::regex regex1(".*\\(([a-zA-Z]+)\\)=(.*)");
+    std::regex regex2("[0-9]+");
+
+    std::smatch var_and_function;
+    std::smatch number;
+
+    std::regex_match(argv[1], var_and_function, regex1);
+    std::regex_match(argv[2], number, regex2);
 
 
-    std::pair<int, int> range = get_range(var, argv[2]);
+    if(var_and_function.size() == 3 && number.size() == 1) {
+        std::string var = var_and_function.str(1);
+        std::string function = to_postfix(var_and_function.str(2));
+        int n = std::stoi(number.str(0));
 
-    if(range.first == 0 && range.second == 0) {
-        std::cerr << "Incorrect range format.\n";
-        return;
-    }
-    if(range.first == -1 && range.second == -1) {
-        std::cerr << "Range should be assigned to the variable " << var << ".\n";
-        return;
-    }
+        function = minimize(function, var);
 
 
-    double step = get_step(argv[3]);
-    if(step == 0) {
-        std::cerr << "wrong step, step = 0: infinite loop.\n";
-        return;
-    }
+        std::random_device rd;
+        std::mt19937_64 mt(rd());
+        std::uniform_real_distribution<> dist(0, std::nextafter(1, std::numeric_limits<double>::max()));
 
 
-    function = to_postfix(function);
+        outfile << std::setw(7) << "x" << std::setw(11) << "|" << std::setw(9) << "y"
+            << "\n------------------------------------\n";
 
-    outfile <<
-        std::setw(11) << "x" <<
-        std::setw(11) << "|" <<
-        std::setw(13) << "y" <<
-        "\n---------------------------------------------\n";
+        const int max_threads = std::thread::hardware_concurrency();
+        if(n < 1024 * max_threads) {
+            evaluate_random(function, var, n, dist, mt);
+        } else {
+            std::vector<std::thread> threads;
 
-    function = minimize(function, var);
-
-
-
-    if(range.second - range.first <= 100) {
-        for(double value = range.first; value <= range.second; value += step) {
-            evaluate_postfix(function, var, value);
-        }
-    } else {
-        double start = range.first;
-        double end = range.second;
-        double length = end - start;
-
-        std::thread t1(&Calc::evaluate_multithreaded, this, function, var, start, start + length / 4, step);
-        std::thread t2(&Calc::evaluate_multithreaded, this, function, var, start + length / 4 + 1, start + length / 2, step);
-        std::thread t3(&Calc::evaluate_multithreaded, this, function, var, start + length / 2 + 1, start + 3 * length / 4, step);
-        std::thread t4(&Calc::evaluate_multithreaded, this, function, var, start + 3 * length / 4 + 1, end, step);
-
-        if(t1.joinable()) {
-            t1.join();
-        }
-        if(t2.joinable()) {
-            t2.join();
-        }
-        if(t3.joinable()) {
-            t3.join();
-        }
-        if(t4.joinable()) {
-            t4.join();
-        }
-    }
-
-
-}
-
-
-std::string Calc::get_varname(const std::string& str) const {
-    if(!is_function(str)) {
-        return "";
-    }
-
-    std::string var;
-    int i = 0;
-    while(std::isalnum(str[i])) {
-        ++i;
-    }
-
-    while(std::isalnum(str[++i])) {
-        var += str[i];
-    }
-
-    return var;
-}
-
-
-std::string Calc::get_function(const std::string& str) const {
-    int i = 0;
-    const size_t length = str.length();
-    while(i < length && str[i] != '=') {
-        ++i;
-    }
-    ++i;
-
-    std::string function;
-    while(i < length) {
-        function += str[i++];
-    }
-    return function;
-}
-
-
-std::pair<int, int> Calc::get_range(const std::string& var, const std::string& str) const {
-    std::pair<int, int> range(0, 0);
-    std::string range_var;
-
-    int i = 0;
-    const size_t length = str.length();
-    while(str[i] != '=' && i < length) {
-        range_var += str[i++];
-    }
-
-    if(var == range_var) {
-
-        bool negative_start = false;
-        if(str[i + 1] == '-') {
-            negative_start = true;
-            ++i;
-        }
-
-        int range_start = str[++i] - '0';
-        while(str[++i] != '.' && i < length) {
-            range_start = 10 * range_start + (str[i] - '0');
-        }
-
-        if(i == length - 1) {
-            range_start = 0;
-        }
-
-        int range_end = 0;
-        bool rend_exists = false;
-        bool negative_end = false;
-
-        while(i < length) {
-            if(str[i] == '.') {
-                ++i;
-            } else if(str[i] >= '0' && str[i] <= '9') {
-                rend_exists = true;
-                range_end = 10 * range_end + (str[i++] - '0');
-            } else if(str[i++] == '-') {
-                negative_end = true;
-            } else {
-                return std::make_pair<int, int>(0, 0);
+            for(int i = 0; i < max_threads; ++i) {
+                threads.emplace_back(&Calc::evaluate_random, this, function, var, n / max_threads, dist, mt);
+                threads[i].detach();
             }
+
+            threads.clear();
         }
 
-        if(rend_exists) {
-            range.first = negative_start ? -range_start : range_start;
-        }
-        range.second = negative_end ? -range_end : range_end;
-    } else {
-        return std::make_pair<int, int>(-1, -1);
     }
-
-    return range;
-}
-
-
-
-double Calc::get_step(const std::string& str) const {
-    const size_t length = str.length();
-    for(int i = 0; i < length; ++i) {
-        if(!std::isdigit(str[i]) && str[i] != '.') {
-            return 0;
-        }
-    }
-    return std::stod(str);
 }
 
 
@@ -360,64 +223,30 @@ void Calc::evaluate_postfix(const std::string& postfix, const std::string& var, 
     double result = operands.top();
 
     outfile << std::setw(11);
-    if(std::floor(value) == std::ceil(value)) {
-        outfile << static_cast<int>(value);
-    } else {
-        outfile << std::fixed << std::setprecision(2) << value;
-    }
-    outfile << std::setw(11) << "|" << std::setw(13);
-    if(std::floor(result) == std::ceil(result)) {
-        outfile << static_cast<int>(result);
-    } else {
-        outfile << std::fixed << std::setprecision(2) << result;
-    }
+        outfile << std::setprecision(6) << value;
+    outfile << std::setw(7) << "|" << std::setw(13);
+    outfile << std::fixed << result;
     outfile << '\n';
 }
 
 
-void Calc::evaluate_multithreaded(const std::string& postfix, const std::string& var,
-                                  double start, double end, double step) {
-    m.lock();
-    for(double value = start; value <= end; value += step) {
-        evaluate_postfix(postfix, var, value);
-    }
-    m.unlock();
-}
+void Calc::evaluate_random(const std::string& postfix, const std::string& var, int n,
+                           const std::uniform_real_distribution<>& dist, std::mt19937_64 mt) {
+    std::set<double> random_numbers;
 
-
-bool Calc::is_function(const std::string& str) const {
-    if(!std::isalpha(str[0])) {
-        return false;
-    }
-
-    int i = 0;
-    const size_t length = str.length();
-    while(std::isalnum(str[i]) && i < length) {
-        ++i;
-    }
-
-    if(str[i] != '(') {
-        return false;
-    }
-
-    bool var_exists = false;
-    while(i < length) {
-        ++i;
-        if(std::isalnum(str[i])) {
-            var_exists = true;
-        } else if(str[i] == ')' && str[i + 1] == '=' && var_exists) {
-            return true;
+    for(int i = 0; i < n; ++i) {
+        double random = dist(mt);
+        if(random_numbers.find(random) == random_numbers.end()) {
+            evaluate_postfix(postfix, var, random);
+        } else {
+            --i; // generate again
         }
     }
-
-    return false;
 }
-
 
 bool Calc::is_operator(char c) const {
     return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
 }
-
 
 unsigned short Calc::priority(char c) const {
     switch(c) {
@@ -432,23 +261,4 @@ unsigned short Calc::priority(char c) const {
         default:
             return 0;
     }
-}
-
-bool Calc::unknown_identifier_found(const std::string& function, const std::string& var) const {
-    const size_t length = function.length();
-
-    for(size_t i = 0; i < length; ++i) {
-        if(std::isalpha(function[i])) {
-            std::string var_in_function;
-            while(std::isalpha(function[i])) {
-                var_in_function += function[i++];
-            }
-
-            if(var_in_function != var) {
-                return true;
-            }
-        }
-    }
-
-    return false;
 }
