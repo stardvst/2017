@@ -3,8 +3,8 @@
 
 #include <fstream>
 #include <utility>
-#include <random>
 #include <string>
+#include <mutex>
 
 
 class Calc {
@@ -16,14 +16,16 @@ private:
     std::string minimize(const std::string&, const std::string&) const;
     void evaluate_postfix(const std::string&, const std::string&, double);
 
-    void evaluate_random(const std::string&, const std::string&, int,
-                         const std::uniform_real_distribution<>&, std::mt19937_64);
+    void evaluate_multithreaded(const std::string&, const std::string&, double, double, double);
 
     bool is_operator(char) const;
     unsigned short priority(char) const;
 private:
     std::ofstream outfile;
     std::vector<std::string> argv;
+
+    static int max_threads;
+    static std::mutex m;
 };
 
 #endif // !CALC_HPP

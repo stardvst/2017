@@ -1,67 +1,71 @@
-#include <exception>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <utility>
 #include <thread>
-#include <random>
 #include <vector>
 #include <string>
 #include <cctype>
-#include <limits>
 #include <stack>
-#include <mutex>
 #include <regex>
-#include <cmath>
-#include <set>
+#include <mutex>
 #include "Calc.hpp"
 
 
-Calc::Calc(const std::string& of, const std::vector<std::string>& args) : outfile(of), argv(args) {}
+std::mutex Calc::m;
+int Calc::max_threads = std::thread::hardware_concurrency();
+
+
+Calc::Calc(const std::string& of, const std::vector<std::string>& args) 
+    : outfile(of), argv(args) {}
 
 
 void Calc::evaluate() {
 
     std::regex regex1(".*\\(([a-zA-Z]+)\\)=(.*)");
-    std::regex regex2("[0-9]+");
+    std::regex regex2("([+-]?[0-9]+(.[0-9]+)?)..([+-]?[0-9]+(.[0-9]+)?)");
+    std::regex regex3("[+-]?[0-9]+(.[0-9]+)?");
 
     std::smatch var_and_function;
-    std::smatch number;
+    std::smatch range;
+    std::smatch step;
 
     std::regex_match(argv[1], var_and_function, regex1);
-    std::regex_match(argv[2], number, regex2);
+    std::regex_match(argv[2], range, regex2);
+    std::regex_match(argv[3], step, regex3);
 
-
-    if(var_and_function.size() == 3 && number.size() == 1) {
+    if(var_and_function.size() == 3 && range.size() == 5 && step.size() == 2) {
         std::string var = var_and_function.str(1);
         std::string function = to_postfix(var_and_function.str(2));
-        int n = std::stoi(number.str(0));
+        double range_start = std::stod(range.str(1));
+        double range_end = std::stod(range.str(3));
+        double the_step = std::stod(step.str(0));
 
         function = minimize(function, var);
 
 
-        std::random_device rd;
-        std::mt19937_64 mt(rd());
-        std::uniform_real_distribution<> dist(0, std::nextafter(1, std::numeric_limits<double>::max()));
+        outfile << std::setw(11) << "x" << std::setw(11) << "|" << std::setw(13) << "y" <<
+            "\n---------------------------------------------\n";
 
-
-        outfile << std::setw(7) << "x" << std::setw(11) << "|" << std::setw(9) << "y"
-            << "\n------------------------------------\n";
-
-        const int max_threads = std::thread::hardware_concurrency();
-        if(n < 1024 * max_threads) {
-            evaluate_random(function, var, n, dist, mt);
+        if(range_end - range_start < 4096 / max_threads) {
+            for(double value = range_start; value <= range_end; value += the_step) {
+                evaluate_postfix(function, var, value);
+            }
         } else {
+            const double range_length = (range_end - range_start) / max_threads;
+
             std::vector<std::thread> threads;
 
             for(int i = 0; i < max_threads; ++i) {
-                threads.emplace_back(&Calc::evaluate_random, this, function, var, n / max_threads, dist, mt);
+                threads.emplace_back([&] {
+                    evaluate_multithreaded(function, var,
+                                           range_start + i * range_length + (i == 0 ? 0 : 1), range_start + (i + 1) * range_length,
+                                           the_step);
+                });
                 threads[i].detach();
             }
 
             threads.clear();
         }
-
     }
 }
 
@@ -223,30 +227,34 @@ void Calc::evaluate_postfix(const std::string& postfix, const std::string& var, 
     double result = operands.top();
 
     outfile << std::setw(11);
-        outfile << std::setprecision(6) << value;
-    outfile << std::setw(7) << "|" << std::setw(13);
-    outfile << std::fixed << result;
+    if(std::floor(value) == std::ceil(value)) {
+        outfile << static_cast<int>(value);
+    } else {
+        outfile << std::fixed << std::setprecision(2) << value;
+    }
+    outfile << std::setw(11) << "|" << std::setw(13);
+    if(std::floor(result) == std::ceil(result)) {
+        outfile << static_cast<int>(result);
+    } else {
+        outfile << std::fixed << std::setprecision(2) << result;
+    }
     outfile << '\n';
 }
 
 
-void Calc::evaluate_random(const std::string& postfix, const std::string& var, int n,
-                           const std::uniform_real_distribution<>& dist, std::mt19937_64 mt) {
-    std::set<double> random_numbers;
-
-    for(int i = 0; i < n; ++i) {
-        double random = dist(mt);
-        if(random_numbers.find(random) == random_numbers.end()) {
-            evaluate_postfix(postfix, var, random);
-        } else {
-            --i; // generate again
-        }
+void Calc::evaluate_multithreaded(const std::string& postfix, const std::string& var,
+                                  double start, double end, double step) {
+    std::lock_guard<std::mutex> lock(m);
+    for(double value = start; value <= end; value += step) {
+        evaluate_postfix(postfix, var, value);
     }
 }
+
 
 bool Calc::is_operator(char c) const {
     return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
 }
+
 
 unsigned short Calc::priority(char c) const {
     switch(c) {
