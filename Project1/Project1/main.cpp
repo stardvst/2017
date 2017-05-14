@@ -17,8 +17,20 @@ int main() {
         std::getline(file, line);
         std::istringstream iss(line);
         while(iss >> line) {
-            rbt.insert(line);
+            if(line != "{" && line != "}") {
+                rbt.insert(line);
+            }
         }
+
+
+        std::string to_delete;
+        std::cout << "\n\nenter values to delete (ctrl+z to exit)\n\nvalue: ";
+        while(std::cin >> to_delete) {
+            rbt.remove(to_delete);
+            std::cout << "value: ";
+        }
+        std::cout << '\n';
+
 
         preorder(rbt);
 

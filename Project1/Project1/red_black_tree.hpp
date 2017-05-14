@@ -432,7 +432,6 @@ Node<T>* RedBlackTree<T>::find_node(const T& value) const {
 }
 
 
-
 template<typename U>
 void preorder(const RedBlackTree<U>& rbt) {
     std::stack<Node<U>*> stack;

@@ -1,1 +1,1 @@
-A C B F G E D
+B { A F { D { C E } G } }
