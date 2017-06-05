@@ -1,21 +1,26 @@
 #include <iostream>
-#include <iomanip>
-#include <stack>
-#include <cmath>
 
+
+class A {
+public:
+    virtual void f() { std::cout << "A::f"; }
+    A() { f(); }
+    /* virtual */ ~A() { f(); }
+};
+
+
+class B : public A {
+public:
+    void f() override { std::cout << "B::f"; }
+    B() { f(); }
+    ~B() { f(); }
+};
 
 int main() {
 
-    std::stack<double> numbers;
-    double number;
-    while(std::cin >> number) {
-        numbers.push(number);
-    }
-
-    while(!numbers.empty()) {
-        std::cout << std::fixed << std::setprecision(4) << std::sqrt(numbers.top()) << '\n';
-        numbers.pop();
-    }
+    A* p = new B;
+    p->f();
+    delete p;
 
     std::cin.get();
     return 0;
