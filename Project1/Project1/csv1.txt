@@ -1,9 +1,0 @@
-aaa, 3, 2
-bbb, 7, 5
-aaa, 2, 1
-ddd, 1, 6
-bbb, 2, 4
-aaa, 1, 3
-aaa, 3, 2
-eee, 7, 2
-ddd, 1, 6
