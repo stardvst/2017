@@ -1,25 +1,18 @@
 #include <iostream>
 #include <vector>
-#include <random>
 
 
-int RANDOM_SEARCH(const std::vector<int>& A, int x) {
-    const int n = static_cast<int>(A.size());
-    std::vector<bool> C(n, false);
-    int picked = 0;
-    std::random_device rd;
-    std::mt19937_64 mt(rd());
-    std::uniform_int_distribution<> dist(0, n - 1);
-    while(true) {
-        int i = dist(mt);
-        if(C[i] == false) {
-            C[i] = true;
-            ++picked;
-            if(picked == n) {
-                return -1;
-            } else if(A[i] == x) {
-                return i;
-            }
+void COMPARE_EXCHANGE(std::vector<int>& A, int i, int j) {
+    if(A[i] > A[j]) {
+        std::swap(A[i], A[j]);
+    }
+}
+
+void INSERTION_SORT(std::vector<int>& A) {
+    const int size = static_cast<int>(A.size());
+    for(int j = 2; j < size; ++j) {
+        for(int i = j - 1; i >= 0; --i) {
+            COMPARE_EXCHANGE(A, i, i + 1);
         }
     }
 }
@@ -28,7 +21,10 @@ int RANDOM_SEARCH(const std::vector<int>& A, int x) {
 int main() {
 
     std::vector<int> A { 3,1,6,8,7,5,3 };
-    std::cout << RANDOM_SEARCH(A, 3);
+    INSERTION_SORT(A);
+    for(std::size_t i = 0; i < 7; ++i) {
+        std::cout << A[i] << ' ';
+    }
     
     std::cin.get();
     return 0;
