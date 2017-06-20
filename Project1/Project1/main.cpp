@@ -2,21 +2,27 @@
 #include <string>
 
 
-bool is_palindrome(const std::string& s) {
+bool is_balanced(const std::string& s) {
+    int count = 0;
     const std::size_t length = s.length();
-    for(std::size_t i = 0; i < length / 2; ++i) {
-        if(s[i] != s[length - 1 - i]) {
+    for(std::size_t i = 0; i < length; ++i) {
+        if(s[i] == '(') {
+            ++count;
+        } else if(s[i] == ')') {
+            --count;
+        }
+        if(count < 0) { // ) without opening brace
             return false;
         }
     }
-    return true;
+    return !count;
 }
 
 
 int main() {
 
-    std::string s = "abba";
-    std::cout << std::boolalpha << is_palindrome(s);
+    std::string s = "())(";
+    std::cout << std::boolalpha << is_balanced(s);
 
     std::cin.get();
 }
