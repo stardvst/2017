@@ -11,10 +11,10 @@ int longest_0s(const std::vector<int>& v) {
         if(v[i] == 0) {
             ++current_max;
         } else {
-            current_max = 0;
             if(current_max > max) {
                 max = current_max;
             }
+            current_max = 0;
         }
     }
     return (max > current_max) ? max : current_max;
