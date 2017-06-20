@@ -2,27 +2,20 @@
 #include <string>
 
 
-bool is_balanced(const std::string& s) {
-    int count = 0;
-    const std::size_t length = s.length();
-    for(std::size_t i = 0; i < length; ++i) {
-        if(s[i] == '(') {
-            ++count;
-        } else if(s[i] == ')') {
-            --count;
-        }
-        if(count < 0) { // ) without opening brace
-            return false;
+bool is_perfect(int n) {
+    int sum = 1;
+    for(int i = 2; i <= n / 2; ++i) {
+        if(n % i == 0) {
+            sum += i;
         }
     }
-    return !count;
+    return n == sum;
 }
 
 
 int main() {
 
-    std::string s = "())(";
-    std::cout << std::boolalpha << is_balanced(s);
+    std::cout << std::boolalpha << is_perfect(28);
 
     std::cin.get();
 }
