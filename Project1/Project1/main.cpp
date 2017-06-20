@@ -1,21 +1,29 @@
 #include <iostream>
-#include <string>
+#include <vector>
 
 
-bool is_perfect(int n) {
-    int sum = 1;
-    for(int i = 2; i <= n / 2; ++i) {
-        if(n % i == 0) {
-            sum += i;
+int longest_0s(const std::vector<int>& v) {
+    const std::size_t size = v.size();
+
+    int max = 0;
+    int current_max = 0;
+    for(int i = 0; i < size; ++i) {
+        if(v[i] == 0) {
+            ++current_max;
+        } else {
+            current_max = 0;
+            if(current_max > max) {
+                max = current_max;
+            }
         }
     }
-    return n == sum;
+    return (max > current_max) ? max : current_max;
 }
-
 
 int main() {
 
-    std::cout << std::boolalpha << is_perfect(28);
+    std::vector<int> v { 5,0,0,0,1,0,0,2,0,0,0,0 };
+    std::cout << longest_0s(v);
 
     std::cin.get();
 }
