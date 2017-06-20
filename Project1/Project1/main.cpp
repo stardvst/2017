@@ -2,26 +2,18 @@
 #include <vector>
 
 
-int sort_order(const std::vector<int>& v) {
-    const std::size_t size = v.size();
-
-    int asc = true;
-    int desc = true;
-    for(int i = 0; i < size - 1; ++i) {
-        if(v[i] < v[i + 1]) {
-            desc = false;
-        } else if(v[i] > v[i + 1]) {
-            asc = false;
-        }
+int count_ones(int start, const std::vector<int>& v) {
+    if(start < v.size()) {
+        return (v[start] == 1) + count_ones(start + 1, v);
     }
-    return asc ? 1 : desc ? -1 : 0;
+    return 0;
 }
 
 
 int main() {
 
-    std::vector<int> v { 0,1,1,5,7,8 };
-    std::cout << sort_order(v);
+    std::vector<int> v { 0,1,1,5,7,8,1 };
+    std::cout << count_ones(0, v);
 
     std::cin.get();
 }
