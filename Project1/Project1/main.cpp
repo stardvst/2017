@@ -1,58 +1,23 @@
-#include <algorithm>
 #include <iostream>
-#include <iterator>
-#include <vector>
-#include <list>
 
-std::vector<int> pigeonhole_sort(const std::vector<int> &v) {
-    int min = v.at(0);
-    int max = min;
-    std::size_t i = 1;
+struct Point {
+    int x;
+    int y;
+};
 
-    const std::size_t size = v.size();
-    if(size % 2 == 0) {
-        max = std::max(min, v.at(1));
-        min = std::min(min, v.at(1));
-        i = 2;
-    }
+bool do_overlap(const Point &l1, const Point &r1, const Point &l2, const Point &r2) {
+    if(l1.x > r2.x || l2.x > r1.x) // if one rectangle is on left side of the other
+        return false;
 
-    for(; i < size - 1; i += 2) {
-        int current_min = std::min(v.at(i), v.at(i + 1));
-        int current_max = std::max(v.at(i), v.at(i + 1));
-        if(current_min < min)
-            min = current_min;
-        else if(current_max > max)
-            max = current_max;
-    }
+    if(l1.y < r2.y || l2.y < r1.y) // if one rectangle is above the other
+        return false;
 
-    const int range = max - min + 1;
-
-    std::vector<std::list<int> > holes(range);
-    for(i = 0; i < size; ++i) {
-        int current = v.at(i);
-        holes.at(current - min).push_back(current);
-    }
-
-    std::vector<int> result;
-    for(std::vector<std::list<int> >::const_iterator it = holes.begin(); it != holes.end(); ++it) {        
-        std::list<int> list = *it;
-        if(list.empty())
-            continue;
-
-        for(std::list<int>::const_iterator it2 = list.begin(); it2 != list.end(); ++it2) {
-            result.push_back(*it2);
-        }
-    }
-
-    return result;
+    return true;
 }
 
 int main() {
     
-    std::vector<int> v = { -4, 7, 4, 2, 5, 3, 1, 9, 0, -5 };
-    std::vector<int> sorted = pigeonhole_sort(v);
-    
-    std::copy(sorted.begin(), sorted.end(), std::ostream_iterator<int>(std::cout, " "));
+    std::cout << do_overlap({ 1,5 }, { 6,1 }, { 4,8 }, { 9,4 });
 
     std::cin.get();
 }
