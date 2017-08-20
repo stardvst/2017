@@ -1,23 +1,31 @@
+#include <unordered_map>
+#include <algorithm>
+#include <iterator>
 #include <iostream>
+#include <vector>
 
-struct Point {
-    int x;
-    int y;
-};
+std::vector<int> get_indexing(const std::vector<int> &v) {
+    std::vector<int> tmp(v);
+    std::sort(tmp.begin(), tmp.end());
 
-bool do_overlap(const Point &l1, const Point &r1, const Point &l2, const Point &r2) {
-    if(l1.x > r2.x || l2.x > r1.x) // if one rectangle is on left side of the other
-        return false;
+    std::unordered_map<int, int> map;
+    const int size = static_cast<int>(tmp.size());
+    for(int i = 0; i < size; ++i) {
+        map[tmp[i]] = i;
+    }
 
-    if(l1.y < r2.y || l2.y < r1.y) // if one rectangle is above the other
-        return false;
+    std::vector<int> result;
+    for(std::vector<int>::const_iterator it = v.begin(); it != v.end(); ++it) {
+        result.push_back(map[*it]);
+    }
 
-    return true;
+    return result;
 }
 
 int main() {
     
-    std::cout << do_overlap({ 1,5 }, { 6,1 }, { 4,8 }, { 9,4 });
-
+    std::vector<int> v = get_indexing({ 7, 9, 8, 1, 4 });
+    copy(v.begin(), v.end(), std::ostream_iterator<int>(std::cout, " "));
+    
     std::cin.get();
 }
