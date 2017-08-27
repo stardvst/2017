@@ -1,31 +1,38 @@
-#include <unordered_map>
-#include <algorithm>
-#include <iterator>
 #include <iostream>
-#include <vector>
 
-std::vector<int> get_indexing(const std::vector<int> &v) {
-    std::vector<int> tmp(v);
-    std::sort(tmp.begin(), tmp.end());
+// problems: 
+// 1. move construction/assignment is disabled since we have v dtor
+// 2. virtual ~Derived() is useless (it's virtual anyways)
+struct Base {
+    virtual ~Base() = default;
+    virtual void do_a_thing() = 0;
+};
 
-    std::unordered_map<int, int> map;
-    const int size = static_cast<int>(tmp.size());
-    for(int i = 0; i < size; ++i) {
-        map[tmp[i]] = i;
-    }
+struct Derived : Base {
+    virtual ~Derived() = default;
+    void do_a_thing() override {}
+};
 
-    std::vector<int> result;
-    for(std::vector<int>::const_iterator it = v.begin(); it != v.end(); ++it) {
-        result.push_back(map[*it]);
-    }
+// correct: 10% faster
+// Derived objects will have copy/move construction/assignment enabled for them
+struct Base {
+    Base() = default;
+    virtual ~Base() = default;
+    
+    Base(const Base &) = default;
+    Base& operator=(const Base &) = default;
+    
+    Base(Base &&) = default;
+    Base& operator=(Base &&) = default;
 
-    return result;
-}
+    virtual void do_a_thing() = 0;
+};
+
+struct Derived : Base {
+    void do_a_thing() override {}
+};
 
 int main() {
-    
-    std::vector<int> v = get_indexing({ 7, 9, 8, 1, 4 });
-    copy(v.begin(), v.end(), std::ostream_iterator<int>(std::cout, " "));
     
     std::cin.get();
 }
