@@ -1,31 +1,22 @@
-#include <iostream>
-#include <memory>
+#include <vector>
 
-struct Base { virtual int value() const { return 1; } };
-struct Derived : Base { int value() const { return 2; } };
+struct B {
+    virtual ~B() = default; // plus the other default operations
+    virtual std::vector<int> get_vec() const = 0;
+};
 
-//// don't do this
-//int use_a_base(std::shared_ptr<Base> p) {
-//    return p->value();
-//}
-//
-//int main() {
-//    auto ptr = std::make_shared<Derived>();
-//    use_a_base(ptr);
-//}
+template<typename T>
+struct D : B {
+    std::vector<int> get_vec() const override { return m_v; }
+    std::vector<int> m_v;
+};
 
-// pass a & to const
-int use_a_base(const Base &p) {
-    return p.value();
-}
+// BETTER!
+struct B {
+    virtual ~B() = default; // plus the other default operations
+    virtual std::vector<int> get_vec() const { return m_v; }
+    std::vector<int> m_v;
+};
 
-// pass a * to const
-int use_a_base(const Base *p) {
-    return p->value();
-}
-
-int main() {
-    auto ptr = std::make_shared<Derived>();
-    std::cout << use_a_base(*ptr.get()) << '\n';
-    std::cout << use_a_base(ptr.get()) << '\n';
-}
+template<typename T>
+struct D : B {};
