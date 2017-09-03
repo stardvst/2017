@@ -17,6 +17,7 @@ public:
         for(int i = 0; i < 10; ++i) {
             std::cout << m_vector[i] << ' ';
         }
+        std::cout << std::endl;
     }
 
 protected:
@@ -32,5 +33,9 @@ private:
 private:
     std::vector<int> m_vector;
 };
+
+bool operator==(const singleton &s1, const singleton &s2) {
+    return s1.get_instance() == s2.get_instance();
+}
 
 #endif // !SINGLETON_H
