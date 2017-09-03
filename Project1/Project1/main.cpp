@@ -1,17 +1,20 @@
 #include "singleton.h"
 
 singleton *singleton::m_instance = nullptr;
+std::unordered_map<std::string, singleton *> singleton::m_registry;
+
+singleton_subclass_1 *singleton_subclass_1::m_instance = nullptr;
 
 int main() {
     
-    singleton *s = singleton::get_instance();
-    s->print();
+    singleton_subclass_1 *ss = singleton_subclass_1::get_instance();
+    ss->print();
 
-    singleton *s2 = singleton::get_instance();
+    singleton_subclass_1 *ss2 = singleton_subclass_1::get_instance();
 
     std::cout << std::boolalpha
-        << "\nare two ptrs equal? " << (s == s2)
-        << "\nare two objects equal? " << (*s == *s2) << std::endl;
+        << "\nare both ptrs (=> both objects) the same? " << (ss == ss2)
+        << std::endl;
 
     std::cin.get();
     return 0;
