@@ -21,10 +21,6 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="mvc.h" />
-    <ClInclude Include="singleton.h" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{96283A95-31A0-4AA1-9EB6-395FB710B615}</ProjectGuid>
     <RootNamespace>Project1</RootNamespace>
