@@ -1,30 +1,31 @@
-#include "singleton.h"
+#include <iostream>
 
-// base singleton's static members need to be defined
-singleton *singleton::m_instance = nullptr;
-std::unordered_map<std::string, singleton *> singleton::m_registry;
-
-// subclass instances need to be defined
-singleton_subclass_1 *singleton_subclass_1::m_instance = nullptr;
-singleton_subclass_2 *singleton_subclass_2::m_instance = nullptr;
+#include "list_tests.h"
+#include "list.h"
 
 int main() {
 
-    singleton_subclass_1 *ss1 = singleton_subclass_1::get_instance();
-    ss1->print_until_4();
+    List<int> list;
 
-    singleton_subclass_2 *ss2 = singleton_subclass_2::get_instance();
-    ss2->print_until_9();
+    std::cout << "enter list elements (ctrl+z or ctrl+d to exit):\n";
+    
+    // add user input to the list
+    int current;
+    while(std::cin >> current) {
+        list.push_back(current);
+    }
 
-    singleton_subclass_1 *ss1_2 = singleton_subclass_1::get_instance();
-    singleton_subclass_2 *ss2_2 = singleton_subclass_2::get_instance();
+    // if the user provided input, print the list 
+    if(!list.empty()) {
+        print(list);
+    }
 
-    std::cout << std::boolalpha
-        << "\nare second ptrs of each subclasses the same as the first ptr?\n"
-        << "subclass1: " << (ss1 == ss1_2)
-        << "\nsubclass2: " << (ss2 == ss2_2)
-        << std::endl;
+    // test list operations
+    std::cout << "\n\ntesting list operations...\n\n";
+    test_operations(list);
 
-    std::cin.get();
+    std::cout << std::endl;
+
+    system("pause");
     return 0;
 }
