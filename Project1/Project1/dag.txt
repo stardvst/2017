@@ -1,0 +1,13 @@
+m -x,q,r
+n -q,u,o
+o -r,v,s
+p -o,s,z
+q -t
+r -u,y
+s -r
+t -
+u -t
+v -x,w
+x - 
+y -v
+z - 

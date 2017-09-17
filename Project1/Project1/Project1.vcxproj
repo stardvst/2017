@@ -27,6 +27,9 @@
     <ClInclude Include="singleton.h" />
     <ClInclude Include="list_tests.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="dag.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{96283A95-31A0-4AA1-9EB6-395FB710B615}</ProjectGuid>
     <RootNamespace>Project1</RootNamespace>

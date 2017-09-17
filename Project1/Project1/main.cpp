@@ -1,31 +1,43 @@
+#include <unordered_map>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <set>
 
-#include "list_tests.h"
-#include "list.h"
+void count_simple_paths(std::unordered_map<std::string, std::set<std::string>> &adj, const std::string &s, const std::string &t, int &count) {
+    if(s == t) {
+        ++count;
+        return;
+    }
+
+    for(auto v : adj[s]) {
+        count_simple_paths(adj, v, t, count);
+    }
+}
 
 int main() {
+    std::unordered_map<std::string, std::set<std::string>> adj_list;
 
-    List<int> list;
+    std::ifstream file("dag.txt");
 
-    std::cout << "enter list elements (ctrl+z or ctrl+d to exit):\n";
-    
-    // add user input to the list
-    int current;
-    while(std::cin >> current) {
-        list.push_back(current);
+
+    for(std::string line; std::getline(file, line); ) {
+        std::string v;
+        std::istringstream iss(line);
+        iss >> v;
+
+        iss.ignore(2);
+
+        for(std::string adj; std::getline(iss, adj, ','); ) {
+            adj_list[v].insert(adj);
+        }
     }
 
-    // if the user provided input, print the list 
-    if(!list.empty()) {
-        print(list);
-    }
+    int count = 0;
+    count_simple_paths(adj_list, "p", "v", count);
+    std::cout << count << std::endl;
 
-    // test list operations
-    std::cout << "\n\ntesting list operations...\n\n";
-    test_operations(list);
-
-    std::cout << std::endl;
-
-    system("pause");
+    std::cin.get();
     return 0;
 }
