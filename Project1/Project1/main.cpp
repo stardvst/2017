@@ -1,46 +1,59 @@
 #include <iostream>
 #include <vector>
 
-struct Component {
-    virtual void traverse() = 0;
+struct AlarmListener {
+    virtual void alarm() = 0;
 };
 
-struct Leaf : Component {
-    Leaf(int val) : v(val) {}
-    void traverse() { std::cout << v << ' '; }
-private:
-    int v;
-};
-
-struct Composite : Component {
-    void add(Component *c) { children.push_back(c); }
-    void traverse() {
-        for(std::size_t i = 0; i < children.size(); ++i) {
-            children[i]->traverse();
+struct SensorSystem {
+    void attach(AlarmListener *al) { listeners.push_back(al); }
+    void soundTheAlarm() {
+        for(std::size_t i = 0; i < listeners.size(); ++i) {
+            listeners[i]->alarm();
         }
     }
 private:
-    std::vector<Component *> children;
+    std::vector<AlarmListener *> listeners;
+};
+
+struct Lighting : AlarmListener {
+    void alarm() { std::cout << "lights up\n"; }
+};
+
+struct Gates : AlarmListener {
+    void alarm() { std::cout << "gates close\n"; }
+};
+
+struct CheckList {
+    void byTheNunbers() {
+        localize();
+        identify();
+        identify();
+    }
+private:
+    virtual void localize() { std::cout << "   establish a perimeter\n"; }
+    virtual void isolate() { std::cout << "   isloate the grid\n"; }
+    virtual void identify() { std::cout << "   identify the source\n"; }
+};
+
+struct Surveillance : CheckList, AlarmListener {
+    void alarm() {
+        std::cout << "Surveillance - by the numbers:\n";
+        byTheNunbers();
+    }
+private:
+    void isolate() {
+        std::cout << "   train the cameras\n";
+    }
 };
 
 int main() {
 
-    Composite containers[4];
-    
-    for(int i = 0; i < 4; ++i) {
-        for(int j = 0; j < 3; ++j) {
-            containers[i].add(new Leaf(i * 3 + j));
-        }
-    }
-
-    for(int i = 1; i < 4; ++i) {
-        containers[0].add(&containers[i]);
-    }
-
-    for(int i = 0; i < 4; ++i) {
-        containers[i].traverse();
-        std::cout << '\n';
-    }
+    SensorSystem ss;
+    ss.attach(&Gates());
+    ss.attach(&Lighting());
+    ss.attach(&Surveillance());
+    ss.soundTheAlarm();
 
     std::cin.get();
     return 0;
