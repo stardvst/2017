@@ -1,86 +1,42 @@
 #include <iostream>
+#include <cstdio>
 #include <string>
 
-struct car {
-    int wheel;
-    int power;
-    std::string body;
+// desired interface
+struct Rectangle {
+    virtual void draw() = 0;
 };
 
-struct builder {
-    virtual void build_wheel() const = 0;
-    virtual void build_power() const = 0;
-    virtual void build_body() const = 0;
-protected:
-    car *m_car;
+// legacy component
+struct LegacyRect {
+    LegacyRect(int x1, int y1, int x2, int y2) : m_x1(x1), m_y1(y1), m_x2(x2), m_y2(y2) {
+        std::cout << "LegacyRect: create - ("
+            << m_x1 << ", " << m_y1 << ") => (" << m_x2 << ", " << m_y2 << ")\n";
+    }
+    void old_draw() {
+        std::cout << "LegacyRect: old draw - ("
+            << m_x1 << ", " << m_y1 << ") => (" << m_x2 << ", " << m_y2 << ")\n";
+    }
+private:
+    int m_x1, m_y1, m_x2, m_y2;
 };
 
-struct x5_builder : builder {
-    x5_builder() { m_car = new car; }
-    void build_wheel() const override { m_car->wheel = 5; }
-    void build_power() const override { m_car->power = 50; }
-    void build_body() const override { m_car->body = "bmw x5"; }
-    car *get_car() const { return m_car; }
-};
-
-struct x6_builder : builder {
-    x6_builder() { m_car = new car; }
-    void build_wheel() const override { m_car->wheel = 6; }
-    void build_power() const override { m_car->power = 60; }
-    void build_body() const override { m_car->body = "bmw x6"; }
-    car *get_car() const { return m_car; }
-};
-
-struct i3_builder : builder {
-    i3_builder() { m_car = new car; }
-    void build_wheel() const override { m_car->wheel = 3; }
-    void build_power() const override { m_car->power = 30; }
-    void build_body() const override { m_car->body = "bmw i3"; }
-    car *get_car() const { return m_car; }
-};
-
-struct director {
-    void construct(builder *car_type) {
-        car_type->build_wheel();
-        car_type->build_power();
-        car_type->build_body();
+// adapter wrapper
+struct RectAdapter : Rectangle, private LegacyRect {
+    RectAdapter(int x, int y, int w, int h) : LegacyRect(x, y, x + w, y + h) {
+        std::cout << "RectAdapter: create - ("
+            << x << ", " << y << "), width = " << w << ", height = " << h << "\n";
+    }
+    virtual void draw() override {
+        std::cout << "RectAdapter: draw - \n";
+        old_draw();
     }
 };
 
 int main() {
 
-    const auto d = new director;
-
-    // construct an x5
-    const auto x5 = new x5_builder; // construct an x5 builder
-    d->construct(x5);               // ask the director to build a car using this builder
-    auto c = x5->get_car();         // get the car from the x5 builder
-
-    std::cout
-        << "car wheel: " << c->wheel << '\n'
-        << "car power: " << c->power << '\n'
-        << "car body: " << c->body << "\n\n";
-
-
-    // construct an x6
-    const auto x6 = new x6_builder;
-    d->construct(x6);
-    c = x6->get_car();
-
-    std::cout
-        << "car wheel: " << c->wheel << '\n'
-        << "car power: " << c->power << '\n'
-        << "car body: " << c->body << "\n\n";
-
-    // construct an i3
-    const auto i3 = new i3_builder;
-    d->construct(i3);
-    c = i3->get_car();
-
-    std::cout
-        << "car wheel: " << c->wheel << '\n'
-        << "car power: " << c->power << '\n'
-        << "car body: " << c->body << "\n\n";
+    Rectangle *r = new RectAdapter(120, 200, 60, 40);
+    r->draw();
 
     std::cin.get();
     return 0;
