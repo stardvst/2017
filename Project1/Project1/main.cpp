@@ -1,55 +1,66 @@
 #include <iostream>
-#include <cstdio>
-#include <string>
 
-struct ExecuteInterface {
-    virtual ~ExecuteInterface() {}
-    virtual void execute() = 0;
+struct TimeImp {
+    TimeImp(int h, int m) : m_h(h), m_m(m) {}
+    virtual void tell() {
+        std::cout << "time is " << m_h << m_m << '\n';
+    }
+protected:
+    int m_h, m_m;
 };
 
-template<typename T>
-struct ExecuteAdapter : ExecuteInterface {
-    ExecuteAdapter(T *o, void(T:: *m)()) : object(o), method(m) {}
-    ~ExecuteAdapter() { delete object; }
-    void execute() override { (object->*method)(); }
-private:
-    T *object;
-    void(T:: *method)();
+struct CivilianTimeImp : TimeImp {
+    CivilianTimeImp(int h, int m, int pm) : TimeImp(h, m) {
+        if(pm)
+            strcpy(m_whichM, " PM");
+        else
+            strcpy(m_whichM, " AM");
+    }
+    void tell() {
+        std::cout << "time is " << m_h << ":" << m_m << m_whichM << '\n';
+    }
+protected:
+    char m_whichM[4];
 };
 
-struct Fea {
-    ~Fea() { std::cout << "Fea::dtor\n"; }
-    void do_this() { std::cout << "Fea::do_this()\n"; }
+struct ZuluTimeImp : TimeImp {
+    ZuluTimeImp(int h, int m, int zone) : TimeImp(h, m) {
+        if(zone == 5)
+            strcpy(m_zone, " Eastern Std Time");
+        else if(zone == 6)
+            strcpy(m_zone, " Central Std Time");
+    }
+    void tell() {
+        std::cout << "time is " << m_h << m_m << m_zone << '\n';
+    }
+protected:
+    char m_zone[30];
 };
 
-struct Feye {
-    ~Feye() { std::cout << "Feye::dtor\n"; }
-    void do_that() { std::cout << "Feye::do_that()\n"; }
+struct Time {
+    Time() {}
+    Time(int h, int m) { imp = new TimeImp(h, m); }
+    virtual void tell() { imp->tell(); }
+protected:
+    TimeImp *imp;
 };
 
-struct Pheau {
-    ~Pheau() { std::cout << "Pheau::dtor\n"; }
-    void do_other() { std::cout << "Pheau::do_this()\n"; }
+struct CivilianTime : Time {
+    CivilianTime(int h, int m, int pm) { imp = new CivilianTimeImp(h, m, pm); }
 };
 
-ExecuteInterface **init() {
-    ExecuteInterface **arr = new ExecuteInterface *[3];
-    arr[0] = new ExecuteAdapter<Fea>(new Fea(), &Fea::do_this);
-    arr[1] = new ExecuteAdapter<Feye>(new Feye(), &Feye::do_that);
-    arr[2] = new ExecuteAdapter<Pheau>(new Pheau(), &Pheau::do_other);
-    return arr;
-}
+struct ZuluTime : Time {
+    ZuluTime(int h, int m, int zone) { imp = new ZuluTimeImp(h, m, zone); }
+};
 
 int main() {
 
-    ExecuteInterface **obs = init();
+    Time *times[3];
+    times[0] = new Time(14, 30);
+    times[1] = new CivilianTime(2, 30, 1);
+    times[2] = new ZuluTime(14, 30, 6);
     for(int i = 0; i < 3; ++i)
-        obs[i]->execute();
-
-    for(int i = 0; i < 3; ++i)
-        delete obs[i];
-
-    delete obs;
+        times[i]->tell();
 
     std::cin.get();
     return 0;
