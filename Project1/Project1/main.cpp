@@ -2,110 +2,54 @@
 #include <cstdio>
 #include <string>
 
-enum class PersistenceType { File, Queue, Pathway };
-
-struct PersistenceAttribute {
-    PersistenceType type;
-    char value[30];
+struct ExecuteInterface {
+    virtual ~ExecuteInterface() {}
+    virtual void execute() = 0;
 };
 
-struct DistrWorkPackage {
-    DistrWorkPackage(char *type) {
-        sprintf(desc, "Distr. work package for: %s", type);
-    }
-
-    void setFile(char *f, char *v) {
-        sprintf(tmp, "\n File(%s): %s", f, v);
-        strcat(desc, tmp);
-    }
-
-    void setQueue(char *q, char *v) {
-        sprintf(tmp, "\n Queue(%s): %s", q, v);
-        strcat(desc, tmp);
-    }
-
-    void setPathway(char *p, char *v) {
-        sprintf(tmp, "\n Pathway(%s): %s", p, v);
-        strcat(desc, tmp);
-    }
-
-    const char *getState() const { return desc; }
+template<typename T>
+struct ExecuteAdapter : ExecuteInterface {
+    ExecuteAdapter(T *o, void(T:: *m)()) : object(o), method(m) {}
+    ~ExecuteAdapter() { delete object; }
+    void execute() override { (object->*method)(); }
 private:
-    char desc[200];
-    char tmp[80];
+    T *object;
+    void(T:: *method)();
 };
 
-/**
-    Builder abstract class
-*/
-struct Builder {
-    virtual void configureFile(char *f) = 0;
-    virtual void configureQueue(char *q) = 0;
-    virtual void configurePathway(char *p) = 0;
-    DistrWorkPackage *getResult() const { return result; }
-protected:
-    DistrWorkPackage *result;
+struct Fea {
+    ~Fea() { std::cout << "Fea::dtor\n"; }
+    void do_this() { std::cout << "Fea::do_this()\n"; }
 };
 
-/**
-    Derived builder classes
-*/
-struct UnixBuilder : Builder {
-    UnixBuilder() { result = new DistrWorkPackage("Unix"); }
-
-    void configureFile(char *f) { result->setFile("flatFile", f); }
-    void configureQueue(char *q) { result->setQueue("FIFO", q); }
-    void configurePathway(char *p) { result->setPathway("thread", p); }
+struct Feye {
+    ~Feye() { std::cout << "Feye::dtor\n"; }
+    void do_that() { std::cout << "Feye::do_that()\n"; }
 };
 
-struct VmsBuilder : Builder {
-    VmsBuilder() { result = new DistrWorkPackage("Vms"); }
-
-    void configureFile(char *f) { result->setFile("ISAM", f); }
-    void configureQueue(char *q) { result->setQueue("pririty", q); }
-    void configurePathway(char *p) { result->setPathway("LWP", p); }
+struct Pheau {
+    ~Pheau() { std::cout << "Pheau::dtor\n"; }
+    void do_other() { std::cout << "Pheau::do_this()\n"; }
 };
 
-/**
-    Reader (director)
-*/
-struct Reader {
-    void setBuilder(Builder *b) { builder = b; }
-    void construct(PersistenceAttribute list[], int num) {
-        for(int i = 0; i < num; ++i)
-            if(list[i].type == PersistenceType::File)
-                builder->configureFile(list[i].value);
-            else if(list[i].type == PersistenceType::Queue)
-                builder->configureQueue(list[i].value);
-            else if(list[i].type == PersistenceType::Pathway)
-                builder->configurePathway(list[i].value);
-    }
-private:
-    Builder *builder;
-};
+ExecuteInterface **init() {
+    ExecuteInterface **arr = new ExecuteInterface *[3];
+    arr[0] = new ExecuteAdapter<Fea>(new Fea(), &Fea::do_this);
+    arr[1] = new ExecuteAdapter<Feye>(new Feye(), &Feye::do_that);
+    arr[2] = new ExecuteAdapter<Pheau>(new Pheau(), &Pheau::do_other);
+    return arr;
+}
 
 int main() {
 
-    PersistenceAttribute input[] = {
-        { PersistenceType::File, "state.dat" },
-        { PersistenceType::File, "config.sys" },
-        { PersistenceType::Queue, "compute" },
-        { PersistenceType::Queue, "log" },
-        { PersistenceType::Pathway, "authentication" },
-        { PersistenceType::Pathway, "error processing" }
-    };
+    ExecuteInterface **obs = init();
+    for(int i = 0; i < 3; ++i)
+        obs[i]->execute();
 
-    Reader reader;
-    
-    UnixBuilder unix_builder;
-    reader.setBuilder(&unix_builder);
-    reader.construct(input, 6);
-    std::cout << unix_builder.getResult()->getState() << std::endl;
+    for(int i = 0; i < 3; ++i)
+        delete obs[i];
 
-    VmsBuilder vms_builder;
-    reader.setBuilder(&vms_builder);
-    reader.construct(input, 6);
-    std::cout << vms_builder.getResult()->getState() << std::endl;
+    delete obs;
 
     std::cin.get();
     return 0;
