@@ -1,51 +1,57 @@
 #include <iostream>
 
-struct Widget {
-    virtual void draw() = 0;
+struct burger {
+    virtual void desc() = 0;
+    virtual int cost() = 0;
 };
 
-struct TextField : Widget {
-    TextField(int w, int h) : width(w), height(h) {}
-    void draw() { std::cout << "TextField: " << width << ", " << height << '\n'; }
+struct french : burger {
+    void desc() { std::cout << "french burger with"; }
+    int cost() { return 100; }
+};
+
+struct italian : burger {
+    void desc() { std::cout << "italian burger with"; }
+    int cost() { return 120; }
+};
+
+struct decorator : burger {
+    decorator(burger *b) : m_burger(b) {}
+    void desc() { m_burger->desc(); }
+    int cost() { return m_burger->cost(); }
 private:
-    int width, height;
+    burger *m_burger;
 };
 
-struct Decorator : Widget {
-    Decorator(Widget *wid) : w(wid) {}
-    void draw() { w->draw(); }
-private:
-    Widget *w;
-};
-
-struct BorderDecorator : Decorator {
-    BorderDecorator(Widget *w) : Decorator(w) {}
-    void draw() {
-        Decorator::draw();
-        std::cout << "   BorderDecorator\n";
+struct cheese : decorator {
+    cheese(burger *b) : decorator(b) {}
+    void desc() {
+        decorator::desc();
+        std::cout << " cheese";
     }
+    int cost() { return decorator::cost() + 150; }
 };
 
-struct ScrollDecorator : Decorator {
-    ScrollDecorator(Widget *w) : Decorator(w) {}
-    void draw() {
-        Decorator::draw();
-        std::cout << "   ScrollDecorator\n";
+struct sauce : decorator {
+    sauce(burger *b) : decorator(b) {}
+    void desc() {
+        decorator::desc();
+        std::cout << " sauce";
     }
+    int cost() { return decorator::cost() + 200; }
 };
 
 int main() {
 
-    Widget *w = new BorderDecorator(
-        new BorderDecorator(
-            new ScrollDecorator(
-                new TextField(80, 24)
-            )
+    burger *b = new sauce(
+        new cheese(
+            new french
         )
     );
 
-    w->draw();
+    b->desc();
 
+    std::cout << "\ncost: " << b->cost() << " dram";
     std::cin.get();
     return 0;
 }
