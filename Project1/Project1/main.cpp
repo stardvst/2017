@@ -1,59 +1,75 @@
 #include <iostream>
 #include <vector>
 
-struct AlarmListener {
-    virtual void alarm() = 0;
-};
+struct auctioneer;
 
-struct SensorSystem {
-    void attach(AlarmListener *al) { listeners.push_back(al); }
-    void soundTheAlarm() {
-        for(std::size_t i = 0; i < listeners.size(); ++i) {
-            listeners[i]->alarm();
-        }
-    }
+// observer
+struct bidder {
+    bidder(auctioneer *a);
+    void imUpdatingTheBid(int bid);
+    void update(int new_bid);
 private:
-    std::vector<AlarmListener *> listeners;
+    auctioneer *m_auctioneer;
+    int global_bid;
 };
 
-struct Lighting : AlarmListener {
-    void alarm() { std::cout << "lights up\n"; }
-};
-
-struct Gates : AlarmListener {
-    void alarm() { std::cout << "gates close\n"; }
-};
-
-struct CheckList {
-    void byTheNunbers() {
-        localize();
-        identify();
-        identify();
-    }
+// subject
+struct auctioneer {
+    auctioneer() { bid = 10; }
+    void add_bidder(bidder *b);
+    void set_bid(int new_bid);
+    int get_bid() const { return bid; }
 private:
-    virtual void localize() { std::cout << "   establish a perimeter\n"; }
-    virtual void isolate() { std::cout << "   isloate the grid\n"; }
-    virtual void identify() { std::cout << "   identify the source\n"; }
+    void notify();
+private:
+    std::vector<bidder *> bidders;
+    int bid;
 };
 
-struct Surveillance : CheckList, AlarmListener {
-    void alarm() {
-        std::cout << "Surveillance - by the numbers:\n";
-        byTheNunbers();
-    }
-private:
-    void isolate() {
-        std::cout << "   train the cameras\n";
-    }
-};
+bidder::bidder(auctioneer *a) : m_auctioneer(a), global_bid(m_auctioneer->get_bid()) {
+    m_auctioneer->add_bidder(this);
+}
+
+void bidder::imUpdatingTheBid(int bid) {
+    m_auctioneer->set_bid(bid);
+    std::cout << "global bid: " << global_bid << '\n';
+}
+void bidder::update(int new_global_bid) {
+    global_bid = new_global_bid;
+}
+
+void auctioneer::add_bidder(bidder *b) { bidders.push_back(b); }
+void auctioneer::set_bid(int new_bid) { 
+    if(new_bid >= 5) { 
+        bid += new_bid;
+        notify();
+    } 
+}
+void auctioneer::notify() {
+    for(auto bidder : bidders)
+        bidder->update(bid);
+}
 
 int main() {
 
-    SensorSystem ss;
-    ss.attach(&Gates());
-    ss.attach(&Lighting());
-    ss.attach(&Surveillance());
-    ss.soundTheAlarm();
+    auctioneer *a = new auctioneer;
+
+    bidder *b1 = new bidder(a);
+    bidder *b2 = new bidder(a);
+    bidder *b3 = new bidder(a);
+    bidder *b4 = new bidder(a);
+
+    b1->imUpdatingTheBid(6);
+    std::cout << "-------------------------------\n";
+
+    b3->imUpdatingTheBid(8);
+    std::cout << "-------------------------------\n";
+
+    b4->imUpdatingTheBid(4);
+    std::cout << "-------------------------------\n";
+
+    b2->imUpdatingTheBid(10);
+    std::cout << "-------------------------------\n";
 
     std::cin.get();
     return 0;
