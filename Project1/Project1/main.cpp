@@ -2,41 +2,110 @@
 #include <cstdio>
 #include <string>
 
-// desired interface
-struct Rectangle {
-    virtual void draw() = 0;
+enum class PersistenceType { File, Queue, Pathway };
+
+struct PersistenceAttribute {
+    PersistenceType type;
+    char value[30];
 };
 
-// legacy component
-struct LegacyRect {
-    LegacyRect(int x1, int y1, int x2, int y2) : m_x1(x1), m_y1(y1), m_x2(x2), m_y2(y2) {
-        std::cout << "LegacyRect: create - ("
-            << m_x1 << ", " << m_y1 << ") => (" << m_x2 << ", " << m_y2 << ")\n";
+struct DistrWorkPackage {
+    DistrWorkPackage(char *type) {
+        sprintf(desc, "Distr. work package for: %s", type);
     }
-    void old_draw() {
-        std::cout << "LegacyRect: old draw - ("
-            << m_x1 << ", " << m_y1 << ") => (" << m_x2 << ", " << m_y2 << ")\n";
+
+    void setFile(char *f, char *v) {
+        sprintf(tmp, "\n File(%s): %s", f, v);
+        strcat(desc, tmp);
+    }
+
+    void setQueue(char *q, char *v) {
+        sprintf(tmp, "\n Queue(%s): %s", q, v);
+        strcat(desc, tmp);
+    }
+
+    void setPathway(char *p, char *v) {
+        sprintf(tmp, "\n Pathway(%s): %s", p, v);
+        strcat(desc, tmp);
+    }
+
+    const char *getState() const { return desc; }
+private:
+    char desc[200];
+    char tmp[80];
+};
+
+/**
+    Builder abstract class
+*/
+struct Builder {
+    virtual void configureFile(char *f) = 0;
+    virtual void configureQueue(char *q) = 0;
+    virtual void configurePathway(char *p) = 0;
+    DistrWorkPackage *getResult() const { return result; }
+protected:
+    DistrWorkPackage *result;
+};
+
+/**
+    Derived builder classes
+*/
+struct UnixBuilder : Builder {
+    UnixBuilder() { result = new DistrWorkPackage("Unix"); }
+
+    void configureFile(char *f) { result->setFile("flatFile", f); }
+    void configureQueue(char *q) { result->setQueue("FIFO", q); }
+    void configurePathway(char *p) { result->setPathway("thread", p); }
+};
+
+struct VmsBuilder : Builder {
+    VmsBuilder() { result = new DistrWorkPackage("Vms"); }
+
+    void configureFile(char *f) { result->setFile("ISAM", f); }
+    void configureQueue(char *q) { result->setQueue("pririty", q); }
+    void configurePathway(char *p) { result->setPathway("LWP", p); }
+};
+
+/**
+    Reader (director)
+*/
+struct Reader {
+    void setBuilder(Builder *b) { builder = b; }
+    void construct(PersistenceAttribute list[], int num) {
+        for(int i = 0; i < num; ++i)
+            if(list[i].type == PersistenceType::File)
+                builder->configureFile(list[i].value);
+            else if(list[i].type == PersistenceType::Queue)
+                builder->configureQueue(list[i].value);
+            else if(list[i].type == PersistenceType::Pathway)
+                builder->configurePathway(list[i].value);
     }
 private:
-    int m_x1, m_y1, m_x2, m_y2;
-};
-
-// adapter wrapper
-struct RectAdapter : Rectangle, private LegacyRect {
-    RectAdapter(int x, int y, int w, int h) : LegacyRect(x, y, x + w, y + h) {
-        std::cout << "RectAdapter: create - ("
-            << x << ", " << y << "), width = " << w << ", height = " << h << "\n";
-    }
-    virtual void draw() override {
-        std::cout << "RectAdapter: draw - \n";
-        old_draw();
-    }
+    Builder *builder;
 };
 
 int main() {
 
-    Rectangle *r = new RectAdapter(120, 200, 60, 40);
-    r->draw();
+    PersistenceAttribute input[] = {
+        { PersistenceType::File, "state.dat" },
+        { PersistenceType::File, "config.sys" },
+        { PersistenceType::Queue, "compute" },
+        { PersistenceType::Queue, "log" },
+        { PersistenceType::Pathway, "authentication" },
+        { PersistenceType::Pathway, "error processing" }
+    };
+
+    Reader reader;
+    
+    UnixBuilder unix_builder;
+    reader.setBuilder(&unix_builder);
+    reader.construct(input, 6);
+    std::cout << unix_builder.getResult()->getState() << std::endl;
+
+    VmsBuilder vms_builder;
+    reader.setBuilder(&vms_builder);
+    reader.construct(input, 6);
+    std::cout << vms_builder.getResult()->getState() << std::endl;
 
     std::cin.get();
     return 0;
