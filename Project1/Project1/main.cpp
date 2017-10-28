@@ -1,36 +1,39 @@
 #include <iostream>
 #include <thread>
-#include <future>
-#include <random>
+#include <atomic>
 
 using namespace std;
 
-int func(int n) {
-    return n;
+atomic<int> accumulator = 0;
+
+void func() {
+    for(auto i = 0; i < 250; ++i)
+        ++accumulator;
 }
 
 struct fnc_ob {
-    int n;
-    fnc_ob(int i) : n(i) {}
-    int operator()() { return n; }
+    void operator()() {
+        for(auto i = 0; i < 250; ++i)
+            ++accumulator;
+    }
 };
 
 int main() {
 
-    thread t1 { []() {
-        cout << this_thread::get_id() << endl;
-        cout << "yield: ";
-        this_thread::yield();
-        cout << "done." << endl << "sleep for 500 ms: ";
-        this_thread::sleep_for(chrono::milliseconds { 500 });
-        cout << "done." << endl << "sleep until a time from now() + 5 seconds: ";
-        this_thread::sleep_until(chrono::steady_clock::now() + chrono::seconds(5));
-        cout << "done." << endl;
+    thread t1 { func };
+
+    thread t2 { []() {
+        for(auto i = 0; i < 250; ++i)
+            ++accumulator;
     } };
 
-    t1.join();
+    thread t3 { fnc_ob() };
 
-    cout << "t1 join complete." << endl;
+    t1.join();
+    t2.join();
+    t3.join();
+
+    cout << accumulator;
 
     std::cin.get();
     return 0;
