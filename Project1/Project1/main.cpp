@@ -1,75 +1,62 @@
 #include <iostream>
-#include <vector>
 
-struct auctioneer;
+struct State;
 
-// observer
-struct bidder {
-    bidder(auctioneer *a);
-    void imUpdatingTheBid(int bid);
-    void update(int new_bid);
+struct Machine {
+    Machine();
+    void set_currect(State *);
+    void on();
+    void off();
 private:
-    auctioneer *m_auctioneer;
-    int global_bid;
+    State *current;
 };
 
-// subject
-struct auctioneer {
-    auctioneer() { bid = 10; }
-    void add_bidder(bidder *b);
-    void set_bid(int new_bid);
-    int get_bid() const { return bid; }
-private:
-    void notify();
-private:
-    std::vector<bidder *> bidders;
-    int bid;
+struct State {
+    virtual void on(Machine *) { std::cout << "already ON\n"; }
+    virtual void off(Machine *) { std::cout << "already OFF\n"; }
 };
 
-bidder::bidder(auctioneer *a) : m_auctioneer(a), global_bid(m_auctioneer->get_bid()) {
-    m_auctioneer->add_bidder(this);
+void Machine::set_currect(State *s) { current = s; }
+void Machine::on() { current->on(this); }
+void Machine::off() { current->off(this); }
+
+struct On : State {
+    On() { std::cout << "   ON ctor"; }
+    ~On() { std::cout << "   ON dtor\n"; }
+    void off(Machine *);
+};
+
+struct Off : State {
+    Off() { std::cout << "   OFF ctor"; }
+    ~Off() { std::cout << "   OFF dtor\n"; }
+    void on(Machine *);
+};
+
+void On::off(Machine *m) {
+    std::cout << "  going from ON to OFF";
+    m->set_currect(new Off());
+    delete this;
 }
 
-void bidder::imUpdatingTheBid(int bid) {
-    m_auctioneer->set_bid(bid);
-    std::cout << "global bid: " << global_bid << '\n';
-}
-void bidder::update(int new_global_bid) {
-    global_bid = new_global_bid;
+void Off::on(Machine *m) {
+    std::cout << "  going from OFF to ON";
+    m->set_currect(new On());
+    delete this;
 }
 
-void auctioneer::add_bidder(bidder *b) { bidders.push_back(b); }
-void auctioneer::set_bid(int new_bid) { 
-    if(new_bid >= 5) { 
-        bid += new_bid;
-        notify();
-    } 
-}
-void auctioneer::notify() {
-    for(auto bidder : bidders)
-        bidder->update(bid);
-}
+Machine::Machine() { current = new Off(); std::cout << '\n'; }
 
 int main() {
 
-    auctioneer *a = new auctioneer;
+    void(Machine:: *ptrs[])() = { &Machine::off, &Machine::on };
 
-    bidder *b1 = new bidder(a);
-    bidder *b2 = new bidder(a);
-    bidder *b3 = new bidder(a);
-    bidder *b4 = new bidder(a);
-
-    b1->imUpdatingTheBid(6);
-    std::cout << "-------------------------------\n";
-
-    b3->imUpdatingTheBid(8);
-    std::cout << "-------------------------------\n";
-
-    b4->imUpdatingTheBid(4);
-    std::cout << "-------------------------------\n";
-
-    b2->imUpdatingTheBid(10);
-    std::cout << "-------------------------------\n";
+    Machine fsm;
+    int num;
+    while(1) {
+        std::cout << "enter 0/1: ";
+        std::cin >> num;
+        (fsm.*ptrs[num])();
+    }
 
     std::cin.get();
     return 0;
