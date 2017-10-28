@@ -17,13 +17,20 @@ struct fnc_ob {
 
 int main() {
 
-    future<int> f5 = async(func, 5);
-    future<int> f10 = async(fnc_ob(10));
-    auto f20 = async([](int i) {return i; }, 20);
+    thread t1 { []() {
+        cout << this_thread::get_id() << endl;
+        cout << "yield: ";
+        this_thread::yield();
+        cout << "done." << endl << "sleep for 500 ms: ";
+        this_thread::sleep_for(chrono::milliseconds { 500 });
+        cout << "done." << endl << "sleep until a time from now() + 5 seconds: ";
+        this_thread::sleep_until(chrono::steady_clock::now() + chrono::seconds(5));
+        cout << "done." << endl;
+    } };
 
-    cout << f5.get() << endl;
-    cout << f10.get() << endl;
-    cout << f20.get() << endl;
+    t1.join();
+
+    cout << "t1 join complete." << endl;
 
     std::cin.get();
     return 0;
