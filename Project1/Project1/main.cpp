@@ -5,22 +5,17 @@
 
 using namespace std;
 
-void consumer(future<char> &fx) {
-    char c = fx.get();
-    cout << c << endl;
+int func(int n) {
+    return n;
 }
 
 int main() {
 
-    promise<char> px;
-    future<char> fx = px.get_future();
+    packaged_task<int(int)> f(func); // assign a function to p_t
+    future<int /*ret val*/> r = f.get_future(); // link a future to ret val of p_t f
 
-    thread t1(consumer, ref(fx));
-
-    default_random_engine eng;
-    uniform_int<char> dist { 'a', 'z' };
-
-    px.set_value(dist(eng));
+    thread t1(move(f), 9); // no copy ctor so it must be moved (to keep uniquness of p_t)
+    cout << r.get() << endl;
 
     t1.join();
 
