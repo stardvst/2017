@@ -1,39 +1,30 @@
 #include <iostream>
-#include <thread>
-#include <atomic>
+#include <memory>
 
 using namespace std;
 
-atomic<int> accumulator = 0;
-
-void func() {
-    for(auto i = 0; i < 250; ++i)
-        ++accumulator;
-}
-
-struct fnc_ob {
-    void operator()() {
-        for(auto i = 0; i < 250; ++i)
-            ++accumulator;
-    }
+struct A {
+    A() { cout << "ctor"; }
+    A(const A&) { cout << "copy ctor"; }
+    ~A() { cout << "dtor"; }
 };
+
+void fn(shared_ptr<char> spc) {
+    cout << spc.use_count();
+}
 
 int main() {
 
-    thread t1 { func };
+    shared_ptr<A> sp1(new A);
+    //*sp1 = 'a';
 
-    thread t2 { []() {
-        for(auto i = 0; i < 250; ++i)
-            ++accumulator;
-    } };
+    shared_ptr<A> sp2 = sp1;
 
-    thread t3 { fnc_ob() };
+    sp1.reset();
 
-    t1.join();
-    t2.join();
-    t3.join();
-
-    cout << accumulator;
+    /*sp2.reset();
+    cout << sp1.use_count();
+    cout << sp2.use_count();*/
 
     std::cin.get();
     return 0;
