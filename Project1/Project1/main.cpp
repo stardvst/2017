@@ -9,22 +9,25 @@ struct A {
     ~A() { cout << "dtor"; }
 };
 
-void fn(shared_ptr<char> spc) {
-    cout << spc.use_count();
+void fn(unique_ptr<char> spc) {
+    cout << *spc;
 }
 
 int main() {
 
-    shared_ptr<A> sp1(new A);
-    //*sp1 = 'a';
+    unique_ptr<char> up1(new char);
+    *up1 = 'a';
 
-    shared_ptr<A> sp2 = sp1;
+    unique_ptr<char> up2 = move(up1);
 
-    sp1.reset();
+    //fn(move(up2));
 
-    /*sp2.reset();
-    cout << sp1.use_count();
-    cout << sp2.use_count();*/
+    up1.reset(new char);
+    *up1 = 't';
+    cout << *up1;
+    up1.reset(new char);
+    cout << *up1;
+
 
     std::cin.get();
     return 0;
