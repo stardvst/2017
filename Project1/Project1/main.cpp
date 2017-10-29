@@ -1,34 +1,19 @@
 #include <iostream>
-#include <memory>
 
 using namespace std;
 
-struct A {
-    A() { cout << "ctor"; }
-    A(const A&) { cout << "copy ctor"; }
-    ~A() { cout << "dtor"; }
-};
-
-void fn(unique_ptr<char> spc) {
-    cout << *spc;
-}
 
 int main() {
 
-    unique_ptr<char> up1(new char);
-    *up1 = 'a';
+    int a = 1, b = 1;
+    double r = 1.0, s = 1.0;
+    //double e, f;
 
-    unique_ptr<char> up2 = move(up1);
+    auto ff = [](auto x, auto y) { return x + y; };
+    auto f3 = [e = 2, f = 2]() {return e*f; };
 
-    //fn(move(up2));
-
-    up1.reset(new char);
-    *up1 = 't';
-    cout << *up1;
-    up1.reset(new char);
-    cout << *up1;
-
-
+    cout << ff(a, b) << '\n' << ff(r, s) << '\n' << f3();
+    
     std::cin.get();
     return 0;
 }
